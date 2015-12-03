@@ -1,8 +1,7 @@
 package org.xflash.astar;
 
-import org.lwjgl.util.Dimension;
 import org.newdawn.slick.*;
-import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.gui.TextField;
 
 /**
  */
@@ -12,8 +11,7 @@ public class AStarGame extends BasicGame {
     private int xm;
     private int ym;
     private Crawler crawler;
-    private Rectangle up;
-    private Rectangle down;
+    private TextField textField;
 
     public AStarGame() {
         super("AStar");
@@ -21,21 +19,17 @@ public class AStarGame extends BasicGame {
 
     @Override
     public void init(GameContainer gc) throws SlickException {
-        playMap = new PlayMap(new Dimension(20, 10));
-        gc.getInput().addMouseListener(playMap);
+        playMap = new PlayMap(gc, 20, 10);
         playMap.setStart(2, 5);
         playMap.setFinish(18, 5);
+        playMap.setLocation(20, 100);
 
-        crawler = new Crawler(playMap);
-
-        down = new Rectangle(400, 200, 20, 20);
-        up = new Rectangle(425, 200, 20, 20);
-
-
+        crawler = new Crawler(gc, playMap, 400, 200);
     }
 
     @Override
     public void update(GameContainer gc, int frame) throws SlickException {
+        playMap.update(gc, frame);
         crawler.update(gc, frame);
     }
 
@@ -45,13 +39,6 @@ public class AStarGame extends BasicGame {
         gfx.setColor(Color.cyan);
         gfx.drawString(String.format("%d,%d", xm, ym), xm + 10, ym + 10);
 
-        Font font = gfx.getFont();
-        gfx.draw(up);
-        gfx.drawString("+", up.getX()+ font.getWidth("+")/2, up.getY());
-        gfx.draw(down);
-        gfx.drawString("-", down.getX()+ font.getWidth("-")/2, down.getY());
-        gfx.drawString(String.format("max dist. = %d",crawler.getMaxSearchDistance()), down.getX(), down.getY()-font.getLineHeight());
-        
 
         crawler.render(gc, gfx);
     }
@@ -61,13 +48,4 @@ public class AStarGame extends BasicGame {
         this.ym=ym;
     }
 
-    @Override
-    public void mouseClicked(int button, int x, int y, int clickCount) {
-        if(up.contains(x,y)) {
-            crawler.increaseDepth();
-        } else if(down.contains(x,y)){
-            crawler.decreaseDepth();
-        }
-        else crawler.updatePath();
-    }
 }

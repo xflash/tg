@@ -1,40 +1,59 @@
 package org.xflash.astar;
 
-import org.lwjgl.util.Dimension;
 import org.lwjgl.util.Point;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.util.InputAdapter;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.gui.AbstractComponent;
+import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  */
-public class PlayMap extends InputAdapter implements TileBasedMap {
+public class PlayMap extends AbstractComponent implements TileBasedMap, GameElement {
 
     public static final int TILE_WIDTH = 16;
     public static final int TILE_HEIGHT = 16;
     private final Cell[][] tiles;
+    private Point pos;
     private boolean[][] visited;
-    private final Dimension dimension;
-    private final Point pos;
-    private final Point coord2;
     private Point hover;
     private Point start;
     private Point finish;
+    private HashSet<GameElement> elements = new HashSet<GameElement>();
+    private int widthInTiles;
+    private int heightInTiles;
+    private final Set<MapListener> mapListeners=new HashSet<MapListener>();
+    private boolean over;
 
-    public PlayMap(Dimension dim) {
-        this.dimension = dim;
-        tiles = new Cell[dim.getHeight()][dim.getWidth()];
-        visited = new boolean[dim.getHeight()][dim.getWidth()];
-        pos = new Point(20, 100);
-        coord2 = new Point(pos);
-        coord2.translate(dim.getWidth() * TILE_WIDTH, dim.getHeight() * TILE_HEIGHT);
+    public PlayMap(GUIContext gc, int widthInTiles, int heightInTiles) {
+        super(gc);
+        this.widthInTiles = widthInTiles;
+        this.heightInTiles = heightInTiles;
+        tiles = new Cell[heightInTiles][widthInTiles];
+        visited = new boolean[heightInTiles][widthInTiles];
+    }
+
+    @Override
+    public void setLocation(int x, int y) {
+        pos = new Point(x, y);
     }
 
 
-    public void render(GameContainer gc, Graphics gfx) {
+    public void update(GUIContext container, int delta) {
+        for (GameElement element : elements) {
+            element.update(container, delta);
+        }
+    }
+
+
+    @Override
+    public void render(GUIContext gc, Graphics gfx) {
+
         int yt = pos.getY();
         for (Cell[] row : tiles) {
             int xt = pos.getX();
@@ -48,13 +67,13 @@ public class PlayMap extends InputAdapter implements TileBasedMap {
         for (int r = 0; r < visited.length; r++) {
             boolean[] booleans = visited[r];
             for (int c = 0; c < booleans.length; c++) {
-                if(visited[r][c]) {
+                if (visited[r][c]) {
                     gfx.setColor(Color.magenta);
                     gfx.drawRect(pos.getX() + c * TILE_WIDTH,
                             pos.getY() + r * TILE_HEIGHT,
                             TILE_WIDTH, TILE_HEIGHT);
                 }
-                
+
             }
         }
 
@@ -66,9 +85,14 @@ public class PlayMap extends InputAdapter implements TileBasedMap {
         }
         gfx.setColor(Color.red);
         gfx.drawRect(pos.getX() - 1, pos.getY() - 1,
-                2 + dimension.getWidth() * TILE_WIDTH, 2 + dimension.getHeight() * TILE_HEIGHT);
-        gfx.drawString(String.format("%d,%d - %d,%d", pos.getX(), pos.getY(), coord2.getX(), coord2.getY()),
+                2 + widthInTiles * TILE_WIDTH,
+                2 + heightInTiles * TILE_HEIGHT);
+        gfx.drawString(String.format("%d,%d", pos.getX(), pos.getY()),
                 pos.getX(), pos.getY() - gfx.getFont().getLineHeight() - 5);
+
+        for (GameElement element : elements) {
+            element.render(gc, gfx);
+        }
 
     }
 
@@ -109,7 +133,10 @@ public class PlayMap extends InputAdapter implements TileBasedMap {
 
     @Override
     public void mouseMoved(int oldx, int oldy, int xm, int ym) {
-        if (!isOver(xm, ym)) {
+
+        setOver(Rectangle.contains(xm, ym, getX(), getY(), getWidth() - 1, getHeight() - 1));
+
+        if (!isOver()) {
             hover = null;
             return;
         }
@@ -117,31 +144,35 @@ public class PlayMap extends InputAdapter implements TileBasedMap {
         hover = new Point((xm - pos.getX()) / TILE_WIDTH, (ym - pos.getY()) / TILE_HEIGHT);
     }
 
+
     @Override
     public void mousePressed(int button, int xm, int ym) {
-        if (!isOver(xm, ym)) return;
+        if (!isOver()) return;
 //        System.out.println("button = " + button + " - (" + xm + "," + ym + ")");
         int xt = (xm - pos.getX()) / TILE_WIDTH;
         int yt = (ym - pos.getY()) / TILE_HEIGHT;
-        if(tiles[yt][xt]==Cell.START || tiles[yt][xt]==Cell.FINISH)return;
+        if (tiles[yt][xt] == Cell.START || tiles[yt][xt] == Cell.FINISH) return;
         tiles[yt][xt] = button == 0 ? Cell.WALL : Cell.FREE;
+        for (MapListener mapListener : mapListeners) {
+            mapListener.cellChanged(xt, yt, tiles[yt][xt]);
+        }
     }
 
-    private boolean isOver(int xm, int ym) {
-        return xm >= this.pos.getX() && ym >= this.pos.getY()
-                && xm < coord2.getX() && ym < coord2.getY();
-    }
+//    private boolean isOver(int xm, int ym) {
+//        return xm >= this.pos.getX() && ym >= this.pos.getY()
+//                && xm < coord2.getX() && ym < coord2.getY();
+//    }
 
     public int getWidthInTiles() {
-        return dimension.getWidth();
+        return widthInTiles;
     }
 
     public int getHeightInTiles() {
-        return dimension.getHeight();
+        return heightInTiles;
     }
 
     public void pathFinderVisited(int tx, int ty) {
-        visited[ty][tx]=true;
+        visited[ty][tx] = true;
     }
 
     public boolean blocked(PathFindingContext pathFindingContext, int tx, int ty) {
@@ -165,6 +196,43 @@ public class PlayMap extends InputAdapter implements TileBasedMap {
     }
 
     public void clearVisit() {
-        visited = new boolean[dimension.getHeight()][dimension.getWidth()];
+        visited = new boolean[heightInTiles][widthInTiles];
+    }
+
+    public void add(GameElement element) {
+        elements.add(element);
+    }
+
+
+    @Override
+    public int getX() {
+        return pos.getX();
+    }
+
+    @Override
+    public int getY() {
+        return pos.getY();
+    }
+
+    @Override
+    public int getWidth() {
+        return widthInTiles * TILE_WIDTH;
+    }
+
+    @Override
+    public int getHeight() {
+        return heightInTiles * TILE_HEIGHT;
+    }
+
+    public boolean isOver() {
+        return over;
+    }
+
+    public void setOver(boolean over) {
+        this.over = over;
+    }
+
+    public void addMapListener(MapListener mapListener) {
+        this.mapListeners.add(mapListener);
     }
 }
