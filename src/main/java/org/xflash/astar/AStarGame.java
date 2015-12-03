@@ -1,7 +1,6 @@
 package org.xflash.astar;
 
 import org.newdawn.slick.*;
-import org.newdawn.slick.gui.TextField;
 
 /**
  */
@@ -11,7 +10,6 @@ public class AStarGame extends BasicGame {
     private int xm;
     private int ym;
     private Crawler crawler;
-    private TextField textField;
 
     public AStarGame() {
         super("AStar");
@@ -28,9 +26,8 @@ public class AStarGame extends BasicGame {
     }
 
     @Override
-    public void update(GameContainer gc, int frame) throws SlickException {
-        playMap.update(gc, frame);
-        crawler.update(gc, frame);
+    public void update(GameContainer gc, int delta) throws SlickException {
+        crawler.update(gc, delta);
     }
 
     public void render(GameContainer gc, Graphics gfx) throws SlickException {

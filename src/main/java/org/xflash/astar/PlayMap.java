@@ -5,6 +5,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.AbstractComponent;
+import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
@@ -14,11 +15,12 @@ import java.util.Set;
 
 /**
  */
-public class PlayMap extends AbstractComponent implements TileBasedMap, GameElement {
+public class PlayMap extends AbstractComponent implements TileBasedMap {
 
     public static final int TILE_WIDTH = 16;
     public static final int TILE_HEIGHT = 16;
     private final Cell[][] tiles;
+    private final ClickableBox clickableBox;
     private Point pos;
     private boolean[][] visited;
     private Point hover;
@@ -35,6 +37,13 @@ public class PlayMap extends AbstractComponent implements TileBasedMap, GameElem
         this.heightInTiles = heightInTiles;
         tiles = new Cell[heightInTiles][widthInTiles];
         visited = new boolean[heightInTiles][widthInTiles];
+
+        clickableBox = new ClickableBox(gc, null, 200, 300);
+        clickableBox.addListener(new ComponentListener() {
+            public void componentActivated(AbstractComponent source) {
+                System.out.println("click");
+            }
+        });
     }
 
     @Override
@@ -85,6 +94,8 @@ public class PlayMap extends AbstractComponent implements TileBasedMap, GameElem
                 2 + heightInTiles * TILE_HEIGHT);
         gfx.drawString(String.format("%d,%d", pos.getX(), pos.getY()),
                 pos.getX(), pos.getY() - gfx.getFont().getLineHeight() - 5);
+
+        clickableBox.render(gc, gfx);
 
     }
 
