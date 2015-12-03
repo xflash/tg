@@ -11,7 +11,7 @@ import org.newdawn.slick.gui.GUIContext;
 
 /**
  */
-public class PlusMinusWidget  {
+public class PlusMinus {
     public static final int SPACE = 5;
     private final ClickableBox b2;
     private final ClickableBox b1;
@@ -25,6 +25,10 @@ public class PlusMinusWidget  {
 
     public int getY() {
         return b1.getY();
+    }
+
+    public int getWidth() {
+        return b1.getWidth()+SPACE+b2.getWidth();
     }
 
     private static class ClickableBox extends AbstractComponent {
@@ -80,7 +84,7 @@ public class PlusMinusWidget  {
         }
     }
 
-    public PlusMinusWidget(GUIContext context, int x, int y, int v, final ValueListener valueListener) {
+    public PlusMinus(GUIContext context, int x, int y, int v, final ValueListener valueListener) {
         this.value = v;
         b1 = new ClickableBox(context, "-", x, y);
         b1.addListener(new ComponentListener() {
@@ -101,7 +105,6 @@ public class PlusMinusWidget  {
     }
 
     public void render(GUIContext container, Graphics gfx) throws SlickException {
-        
         b1.render(container, gfx);
         b2.render(container, gfx);
     }

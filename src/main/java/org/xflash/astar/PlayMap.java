@@ -24,7 +24,6 @@ public class PlayMap extends AbstractComponent implements TileBasedMap, GameElem
     private Point hover;
     private Point start;
     private Point finish;
-    private HashSet<GameElement> elements = new HashSet<GameElement>();
     private int widthInTiles;
     private int heightInTiles;
     private final Set<MapListener> mapListeners=new HashSet<MapListener>();
@@ -45,9 +44,6 @@ public class PlayMap extends AbstractComponent implements TileBasedMap, GameElem
 
 
     public void update(GUIContext container, int delta) {
-        for (GameElement element : elements) {
-            element.update(container, delta);
-        }
     }
 
 
@@ -89,10 +85,6 @@ public class PlayMap extends AbstractComponent implements TileBasedMap, GameElem
                 2 + heightInTiles * TILE_HEIGHT);
         gfx.drawString(String.format("%d,%d", pos.getX(), pos.getY()),
                 pos.getX(), pos.getY() - gfx.getFont().getLineHeight() - 5);
-
-        for (GameElement element : elements) {
-            element.render(gc, gfx);
-        }
 
     }
 
@@ -158,11 +150,6 @@ public class PlayMap extends AbstractComponent implements TileBasedMap, GameElem
         }
     }
 
-//    private boolean isOver(int xm, int ym) {
-//        return xm >= this.pos.getX() && ym >= this.pos.getY()
-//                && xm < coord2.getX() && ym < coord2.getY();
-//    }
-
     public int getWidthInTiles() {
         return widthInTiles;
     }
@@ -198,11 +185,6 @@ public class PlayMap extends AbstractComponent implements TileBasedMap, GameElem
     public void clearVisit() {
         visited = new boolean[heightInTiles][widthInTiles];
     }
-
-    public void add(GameElement element) {
-        elements.add(element);
-    }
-
 
     @Override
     public int getX() {
