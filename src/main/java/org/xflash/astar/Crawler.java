@@ -25,15 +25,15 @@ public class Crawler implements Mover {
 
     public Crawler(GameContainer gc, PlayMap playMap, int x, int y) {
         this.playMap = playMap;
-        maxDistanceWidget = new PlusMinus(gc, x, y, 50, new ValueListener<Integer>(){
+        maxDistanceWidget = new PlusMinus(gc, x, y, 50, new ValueListener<Integer>() {
             public void valueChanged(Integer value) {
                 createPathFinder();
             }
         });
 
-        checkBoxWidget = new CheckBoxWidget(gc, x + maxDistanceWidget.getWidth() + 5, y, new ValueListener<Boolean>(){
+        checkBoxWidget = new CheckBoxWidget(gc, x + maxDistanceWidget.getWidth() + 5, y, new ValueListener<Boolean>() {
             public void valueChanged(Boolean value) {
-                updatePath();
+                createPathFinder();
             }
         });
 
@@ -86,7 +86,7 @@ public class Crawler implements Mover {
                 maxDistanceWidget.getY() - gfx.getFont().getLineHeight());
 
         checkBoxWidget.render(gc, gfx);
-        
+
 //        gfx.drawString(String.format("max dist. = %d", getMaxSearchDistance()), down.getX(), down.getY() - font.getLineHeight());
 
     }

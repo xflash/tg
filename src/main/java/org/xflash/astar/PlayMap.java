@@ -20,7 +20,9 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     public static final int TILE_WIDTH = 16;
     public static final int TILE_HEIGHT = 16;
     private final Cell[][] tiles;
-    private final ClickableBox clickableBox;
+    private final ClickableBox startBbox;
+    private final ClickableBox finishBbox;
+    private final ClickableBox wallBbox;
     private Point pos;
     private boolean[][] visited;
     private Point hover;
@@ -31,6 +33,8 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     private final Set<MapListener> mapListeners=new HashSet<MapListener>();
     private boolean over;
 
+    private Cell selectedCell=Cell.FREE;
+
     public PlayMap(GUIContext gc, int widthInTiles, int heightInTiles) {
         super(gc);
         this.widthInTiles = widthInTiles;
@@ -38,10 +42,26 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
         tiles = new Cell[heightInTiles][widthInTiles];
         visited = new boolean[heightInTiles][widthInTiles];
 
-        clickableBox = new ClickableBox(gc, null, 200, 300);
-        clickableBox.addListener(new ComponentListener() {
+        int x = 200;
+        startBbox = new ClickableBox(gc, "S", x, 300);
+        startBbox.addListener(new ComponentListener() {
             public void componentActivated(AbstractComponent source) {
-                System.out.println("click");
+                selectedCell = Cell.START;
+            }
+        });
+        x += startBbox.getWidth() + 5;
+        finishBbox = new ClickableBox(gc, "F", x, 300);
+        finishBbox.addListener(new ComponentListener() {
+            public void componentActivated(AbstractComponent source) {
+                selectedCell = Cell.FINISH;
+            }
+        });
+
+        x += finishBbox.getWidth() + 5;
+        wallBbox = new ClickableBox(gc, "W", x, 300);
+        wallBbox.addListener(new ComponentListener() {
+            public void componentActivated(AbstractComponent abstractComponent) {
+                selectedCell=Cell.WALL;
             }
         });
     }
@@ -49,10 +69,6 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     @Override
     public void setLocation(int x, int y) {
         pos = new Point(x, y);
-    }
-
-
-    public void update(GUIContext container, int delta) {
     }
 
 
@@ -95,7 +111,10 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
         gfx.drawString(String.format("%d,%d", pos.getX(), pos.getY()),
                 pos.getX(), pos.getY() - gfx.getFont().getLineHeight() - 5);
 
-        clickableBox.render(gc, gfx);
+        startBbox.render(gc, gfx);
+        finishBbox.render(gc, gfx);
+        drawCell(gfx, startBbox.getX() - startBbox.getWidth() - 5, startBbox.getY(), selectedCell);
+        wallBbox.render(gc, gfx);
 
     }
 
@@ -113,12 +132,10 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     }
 
     public void setStart(int tx, int ty) {
-        start = new Point(tx, ty);
         setCell(tx, ty, Cell.START);
     }
 
     public void setFinish(int tx, int ty) {
-        finish = new Point(tx, ty);
         setCell(tx, ty, Cell.FINISH);
     }
 
@@ -131,7 +148,33 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     }
 
     private void setCell(int tx, int ty, Cell cell) {
-        this.tiles[ty][tx] = cell;
+
+        if(cell==Cell.FINISH) {
+            clearATile(Cell.FINISH);
+            finish = new Point(tx, ty);
+        }
+        if(cell==Cell.START){
+            clearATile(Cell.START);
+            start = new Point(tx, ty);
+        }
+
+
+        tiles[ty][tx] = cell;
+        for (MapListener mapListener : mapListeners) {
+            mapListener.cellChanged(tx, ty, cell);
+        }
+    }
+
+    private void clearATile(Cell cell) {
+        for (int r = 0; r < tiles.length; r++) {
+            Cell[] tile = tiles[r];
+            for (int c = 0; c < tile.length; c++) {
+                Cell cell1 = tile[c];
+                if(cell.equals(cell1)) {
+                    tiles[r][c]=Cell.FREE;
+                }
+            }
+        }
     }
 
     @Override
@@ -154,11 +197,8 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 //        System.out.println("button = " + button + " - (" + xm + "," + ym + ")");
         int xt = (xm - pos.getX()) / TILE_WIDTH;
         int yt = (ym - pos.getY()) / TILE_HEIGHT;
-        if (tiles[yt][xt] == Cell.START || tiles[yt][xt] == Cell.FINISH) return;
-        tiles[yt][xt] = button == 0 ? Cell.WALL : Cell.FREE;
-        for (MapListener mapListener : mapListeners) {
-            mapListener.cellChanged(xt, yt, tiles[yt][xt]);
-        }
+        setCell(xt, yt, button==0?selectedCell:Cell.FREE);
+
     }
 
     public int getWidthInTiles() {

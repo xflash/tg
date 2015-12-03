@@ -13,6 +13,8 @@ public class ClickableBox extends AbstractComponent {
 
     private final String str;
     private Rectangle box;
+    private Color bgColor = Color.lightGray;
+    private Color borderColor = Color.orange;
 
     public ClickableBox(GUIContext container, String s) {
         this(container, s, 0, 0);
@@ -27,14 +29,23 @@ public class ClickableBox extends AbstractComponent {
     @Override
     public void render(GUIContext container, Graphics gfx)  {
         Font font = gfx.getFont();
-        gfx.setColor(Color.lightGray);
+        gfx.setColor(bgColor);
         gfx.fill(box);
-        gfx.setColor(Color.orange);
+        gfx.setColor(borderColor);
         gfx.draw(box);
         
         if (str != null)
             gfx.drawString(str, box.getX() + font.getWidth(str) / 2, box.getY());
+    }
 
+    public ClickableBox setBgColor(Color bgColor) {
+        this.bgColor = bgColor;
+        return this;
+    }
+
+    public ClickableBox setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
+        return this;
     }
 
     @Override
