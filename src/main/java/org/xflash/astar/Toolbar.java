@@ -21,7 +21,7 @@ public class Toolbar {
     private final int x;
     private final int y;
 
-    Cell selectedCell=Cell.FREE;
+    Cell selectedCell=Cell.WALL;
 
     public Toolbar(GUIContext gc, int x, int y) {
         this.x = x;

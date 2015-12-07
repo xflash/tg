@@ -3,12 +3,11 @@ package org.xflash.astar;
 import org.lwjgl.util.Point;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.AbstractComponent;
-import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
-import org.newdawn.slick.util.pathfinding.PathFindingContext;
-import org.newdawn.slick.util.pathfinding.TileBasedMap;
+import org.newdawn.slick.util.pathfinding.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +21,9 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     private final Cell[][] tiles;
 
     private final Toolbar toolbar;
+    private final PlusMinus maxDistanceWidget;
+    private final CheckBoxWidget checkBoxWidget;
+
     private Point pos;
     private boolean[][] visited;
     private Point hover;
@@ -31,6 +33,7 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     private int heightInTiles;
     private final Set<MapListener> mapListeners=new HashSet<MapListener>();
     private boolean over;
+    private PathFinder pathFinder;
 
 
     public PlayMap(GUIContext gc, int widthInTiles, int heightInTiles) {
@@ -42,6 +45,19 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 
         toolbar = new Toolbar(gc, 200, 300);
 
+        maxDistanceWidget = new PlusMinus(gc, 400, 200, 50, new ValueListener<Integer>() {
+            public void valueChanged(Integer value) {
+                createPathFinder();
+            }
+        });
+
+        checkBoxWidget = new CheckBoxWidget(gc, 400 + maxDistanceWidget.getWidth() + 5, 200, new ValueListener<Boolean>() {
+            public void valueChanged(Boolean value) {
+                createPathFinder();
+            }
+        });
+
+        createPathFinder();
     }
 
     @Override
@@ -51,7 +67,7 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 
 
     @Override
-    public void render(GUIContext gc, Graphics gfx) {
+    public void render(GUIContext gc, Graphics gfx) throws SlickException {
 
         int yt = pos.getY();
         for (Cell[] row : tiles) {
@@ -89,9 +105,28 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
         gfx.drawString(String.format("%d,%d", pos.getX(), pos.getY()),
                 pos.getX(), pos.getY() - gfx.getFont().getLineHeight() - 5);
 
-        toolbar.render(gc,gfx);
+        toolbar.render(gc, gfx);
 
+        maxDistanceWidget.render(gc, gfx);
+        gfx.drawString(String.format("max dist. = %d", maxDistanceWidget.getValue()),
+                maxDistanceWidget.getX(),
+                maxDistanceWidget.getY() - gfx.getFont().getLineHeight());
+
+        checkBoxWidget.render(gc, gfx);
     }
+
+    private void createPathFinder() {
+        System.out.println("createPathFinder with maxSearchDistance=" + maxDistanceWidget.getValue());
+        pathFinder = new AStarPathFinder(this, maxDistanceWidget.getValue(), checkBoxWidget.getValue());
+        notifyMapChange();
+    }
+
+    private void notifyMapChange() {
+        for (MapListener mapListener : mapListeners) {
+            mapListener.pathChanged();
+        }
+    }
+
 
     public void drawCell(Graphics gfx, int x, int y, Cell cell) {
         if (Cell.WALL.equals(cell)) {
@@ -135,9 +170,8 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 
 
         tiles[ty][tx] = cell;
-        for (MapListener mapListener : mapListeners) {
-            mapListener.cellChanged(tx, ty, cell);
-        }
+       
+        notifyMapChange();
     }
 
     private void clearATile(Cell cell) {
@@ -185,7 +219,7 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     }
 
     public void pathFinderVisited(int tx, int ty) {
-        visited[ty][tx] = true;
+//        visited[ty][tx] = true;
     }
 
     public boolean blocked(PathFindingContext pathFindingContext, int tx, int ty) {
@@ -242,5 +276,9 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 
     public void addMapListener(MapListener mapListener) {
         this.mapListeners.add(mapListener);
+    }
+
+    public Path findPath(Mover mover, int x, int y, int x1, int y1) {
+        return pathFinder.findPath(mover, x, y, x1, y1);
     }
 }

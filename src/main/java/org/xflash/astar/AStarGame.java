@@ -22,7 +22,7 @@ public class AStarGame extends BasicGame {
         playMap.setFinish(18, 5);
         playMap.setLocation(20, 100);
 
-        crawler = new Crawler(gc, playMap, 400, 200);
+        crawler = new Crawler(gc, playMap);
     }
 
     @Override
@@ -36,8 +36,9 @@ public class AStarGame extends BasicGame {
         gfx.setColor(Color.cyan);
         gfx.drawString(String.format("%d,%d", xm, ym), xm + 10, ym + 10);
 
-
         crawler.render(gc, gfx);
+
+
     }
 
     public void mouseMoved(int oldx, int oldy, int xm, int ym) {
