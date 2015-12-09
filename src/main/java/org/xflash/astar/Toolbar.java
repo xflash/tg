@@ -1,6 +1,5 @@
 package org.xflash.astar;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
@@ -20,14 +19,6 @@ public class Toolbar {
     private final HashSet<ClickableBox> boxes = new HashSet<ClickableBox>();
     private final int x;
     private final int y;
-    private final Color[] bgColors=new Color[]{
-            //FREE, WALL, START, FINISH
-            Color.black,
-            Color.darkGray,
-            Color.green,
-            Color.blue,
-            
-    };
 
     Cell selectedCell=Cell.WALL;
 
@@ -37,7 +28,7 @@ public class Toolbar {
 
         for (final Cell cell : Cell.values()) {
             ClickableBox clickableBox = new ClickableBox(gc, cell.name().substring(0, 1), x, y);
-            clickableBox.setBgColor(bgColors[cell.ordinal()]);
+            clickableBox.setBgColor(Cell.BG_COLORS[cell.ordinal()]);
             boxes.add(clickableBox);
             clickableBox.addListener(new ComponentListener() {
                 public void componentActivated(AbstractComponent abstractComponent) {
@@ -56,7 +47,7 @@ public class Toolbar {
             x1 += box.getWidth() + 5;
             h = box.getHeight();
         }
-        gfx.setColor(bgColors[selectedCell.ordinal()]);
+        gfx.setColor(Cell.BG_COLORS[selectedCell.ordinal()]);
         gfx.fillRect(x1, y+(h-TILE_HEIGHT)/2, TILE_WIDTH, TILE_HEIGHT);
     }
 

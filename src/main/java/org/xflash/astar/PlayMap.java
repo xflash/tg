@@ -34,6 +34,7 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     private final Set<MapListener> mapListeners=new HashSet<MapListener>();
     private boolean over;
     private PathFinder pathFinder;
+    private boolean cleaninCell;
 
 
     public PlayMap(GUIContext gc, int widthInTiles, int heightInTiles) {
@@ -129,16 +130,13 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 
 
     public void drawCell(Graphics gfx, int x, int y, Cell cell) {
+        if(cell==null || Cell.FREE.equals(cell)) return;
+        
+        gfx.setColor(Cell.BG_COLORS[cell.ordinal()]);
         if (Cell.WALL.equals(cell)) {
-            gfx.setColor(Color.darkGray);
             gfx.fillRect(x + 1, y + 1, TILE_WIDTH - 1, TILE_HEIGHT - 1);
-        } else if (Cell.START.equals(cell)) {
-            gfx.setColor(Color.green);
+        } else 
             gfx.fillRect(x, y, TILE_WIDTH, TILE_HEIGHT);
-        } else if (Cell.FINISH.equals(cell)) {
-            gfx.setColor(Color.blue);
-            gfx.fillRect(x, y, TILE_WIDTH, TILE_HEIGHT);
-        }
     }
 
     public void setStart(int tx, int ty) {
@@ -159,6 +157,14 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 
     private void setCell(int tx, int ty, Cell cell) {
 
+        if(tx<0 || ty<0 || ty>=tiles.length || tx>=tiles[ty].length)return;
+
+        Cell existingCell = tiles[ty][tx];
+        if(Cell.FINISH.equals(existingCell) ||
+                Cell.START.equals(existingCell)) {
+            return;
+        }
+
         if(cell==Cell.FINISH) {
             clearATile(Cell.FINISH);
             finish = new Point(tx, ty);
@@ -167,8 +173,7 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
             clearATile(Cell.START);
             start = new Point(tx, ty);
         }
-
-
+        
         tiles[ty][tx] = cell;
        
         notifyMapChange();
@@ -188,10 +193,7 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 
     @Override
     public void mouseMoved(int oldx, int oldy, int xm, int ym) {
-
-        setOver(Rectangle.contains(xm, ym, getX(), getY(), getWidth() - 1, getHeight() - 1));
-
-        if (!isOver()) {
+        if (!isOver(xm, ym)) {
             hover = null;
             return;
         }
@@ -202,12 +204,29 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
 
     @Override
     public void mousePressed(int button, int xm, int ym) {
-        if (!isOver()) return;
+        if (!isOver(xm, ym)) return;
 //        System.out.println("button = " + button + " - (" + xm + "," + ym + ")");
         int xt = (xm - pos.getX()) / TILE_WIDTH;
         int yt = (ym - pos.getY()) / TILE_HEIGHT;
-        setCell(xt, yt, button==0?toolbar.selectedCell:Cell.FREE);
+        setCell(xt, yt, button == 0 ? toolbar.selectedCell : Cell.FREE);
+        
+        cleaninCell=button==1;
 
+    }
+
+    private boolean isOver(int xm, int ym) {
+        return Rectangle.contains(xm, ym, getX(), getY(), getWidth() - 1, getHeight() - 1);
+    }
+
+    @Override
+    public void mouseDragged(int oldx, int oldy, int xm, int ym) {
+//        super.mouseDragged(oldx, oldy, newx, newy);
+        if (!isOver(xm, ym)) return;
+
+        int xt = (xm - pos.getX()) / TILE_WIDTH;
+        int yt = (ym - pos.getY()) / TILE_HEIGHT;
+//        setCell(xt, yt, button == 0 ? toolbar.selectedCell : Cell.FREE);
+        setCell(xt, yt, cleaninCell?Cell.FREE:toolbar.selectedCell);
     }
 
     public int getWidthInTiles() {
@@ -227,7 +246,11 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     }
 
     public float getCost(PathFindingContext pathFindingContext, int tx, int ty) {
-        return 1.0f;
+        Cell cell = tiles[ty][tx];
+        
+        if(cell==null ) return Cell.FREE.cost();
+        
+        return cell.cost();
     }
 
     public Point getPos() {
@@ -264,14 +287,6 @@ public class PlayMap extends AbstractComponent implements TileBasedMap {
     @Override
     public int getHeight() {
         return heightInTiles * TILE_HEIGHT;
-    }
-
-    public boolean isOver() {
-        return over;
-    }
-
-    public void setOver(boolean over) {
-        this.over = over;
     }
 
     public void addMapListener(MapListener mapListener) {
