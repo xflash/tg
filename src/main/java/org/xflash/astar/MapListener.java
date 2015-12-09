@@ -3,5 +3,5 @@ package org.xflash.astar;
 /**
  */
 public interface MapListener {
-    void pathChanged();
+    void cellChanged(int tx, int ty, Cell cell);
 }
