@@ -21,7 +21,7 @@ public class Toolbar {
     private final int x;
     private final int y;
     private final Color[] bgColors=new Color[]{
-            //FREE,WALL, START, FINISH
+            //FREE, WALL, START, FINISH
             Color.black,
             Color.darkGray,
             Color.green,
