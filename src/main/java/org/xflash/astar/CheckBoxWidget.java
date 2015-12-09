@@ -8,19 +8,31 @@ import org.newdawn.slick.gui.GUIContext;
 
 /**
  */
-public class CheckBoxWidget  {
+public class CheckBoxWidget {
 
+    private final AbstractComponent comp;
     private Rectangle cb;
     private boolean value = false;
-    private final AbstractComponent comp;
 
     public CheckBoxWidget(GUIContext gc, int x, int y, final ValueListener<Boolean> valueListener) {
         comp = new AbstractComponent(gc) {
             @Override
             public void render(GUIContext container, Graphics gfx) throws SlickException {
                 gfx.draw(cb);
-                if(value)
-                    gfx.drawString("X", cb.getX() + gfx.getFont().getWidth("X") / 2, cb.getY());
+                if (value) {
+                    float lineWidth = gfx.getLineWidth();
+                    gfx.setLineWidth(2f);
+                    gfx.drawLine(
+                            cb.getX() + 1, cb.getY() + 2,
+                            cb.getX() + cb.getWidth() - 2, cb.getY() + cb.getHeight() - 2
+                    );
+                    gfx.drawLine(
+                            cb.getX() + 1, cb.getY() + cb.getHeight() - 2,
+                            cb.getX() + cb.getWidth() - 2, cb.getY() + 2
+                    );
+//                    gfx.drawString("X", cb.getX() + gfx.getFont().getWidth("X") / 2, cb.getY());
+                    gfx.setLineWidth(lineWidth);
+                }
             }
 
             @Override
@@ -52,8 +64,8 @@ public class CheckBoxWidget  {
 
             @Override
             public void mousePressed(int button, int xm, int ym) {
-                if(Rectangle.contains(xm, ym, getX(), getY(), getWidth() - 1, getHeight() - 1)) {
-                    value=!value;
+                if (Rectangle.contains(xm, ym, getX(), getY(), getWidth() - 1, getHeight() - 1)) {
+                    value = !value;
                     valueListener.valueChanged(value);
                 }
             }
