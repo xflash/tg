@@ -20,6 +20,14 @@ public class Toolbar {
     private final HashSet<ClickableBox> boxes = new HashSet<ClickableBox>();
     private final int x;
     private final int y;
+    private final Color[] bgColors=new Color[]{
+            //FREE,WALL, START, FINISH
+            Color.black,
+            Color.darkGray,
+            Color.green,
+            Color.blue,
+            
+    };
 
     Cell selectedCell=Cell.WALL;
 
@@ -29,6 +37,7 @@ public class Toolbar {
 
         for (final Cell cell : Cell.values()) {
             ClickableBox clickableBox = new ClickableBox(gc, cell.name().substring(0, 1), x, y);
+            clickableBox.setBgColor(bgColors[cell.ordinal()]);
             boxes.add(clickableBox);
             clickableBox.addListener(new ComponentListener() {
                 public void componentActivated(AbstractComponent abstractComponent) {
@@ -41,23 +50,14 @@ public class Toolbar {
 
     public void render(GUIContext gc, Graphics gfx) {
         int x1=x;
+        int h=TILE_HEIGHT;
         for (ClickableBox box : boxes) {
             box.render(gc, gfx);
             x1 += box.getWidth() + 5;
+            h = box.getHeight();
         }
-        drawCell(gfx, x1, y, selectedCell);
+        gfx.setColor(bgColors[selectedCell.ordinal()]);
+        gfx.fillRect(x1, y+(h-TILE_HEIGHT)/2, TILE_WIDTH, TILE_HEIGHT);
     }
 
-    public void drawCell(Graphics gfx, int x, int y, Cell cell) {
-        if (Cell.WALL.equals(cell)) {
-            gfx.setColor(Color.darkGray);
-            gfx.fillRect(x + 1, y + 1, TILE_WIDTH - 1, TILE_HEIGHT - 1);
-        } else if (Cell.START.equals(cell)) {
-            gfx.setColor(Color.green);
-            gfx.fillRect(x, y, TILE_WIDTH, TILE_HEIGHT);
-        } else if (Cell.FINISH.equals(cell)) {
-            gfx.setColor(Color.blue);
-            gfx.fillRect(x, y, TILE_WIDTH, TILE_HEIGHT);
-        }
-    }
 }
