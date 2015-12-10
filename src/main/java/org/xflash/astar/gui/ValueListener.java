@@ -1,4 +1,4 @@
-package org.xflash.astar;
+package org.xflash.astar.gui;
 
 /**
  */

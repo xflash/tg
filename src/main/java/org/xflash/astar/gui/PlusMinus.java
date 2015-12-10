@@ -1,4 +1,4 @@
-package org.xflash.astar;
+package org.xflash.astar.gui;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -28,7 +28,7 @@ public class PlusMinus {
         return b1.getWidth()+SPACE+b2.getWidth();
     }
 
-    public PlusMinus(GUIContext context, int x, int y, int v, final ValueListener valueListener) {
+    public PlusMinus(GUIContext context, int x, int y, int v, final ValueListener<Integer> valueListener) {
         this.value = v;
         b1 = new ClickableBox(context, "-", x, y);
         b1.addListener(new ComponentListener() {

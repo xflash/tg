@@ -1,4 +1,4 @@
-package org.xflash.astar;
+package org.xflash.astar.gui;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;

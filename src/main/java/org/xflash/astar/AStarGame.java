@@ -1,6 +1,9 @@
 package org.xflash.astar;
 
 import org.newdawn.slick.*;
+import org.xflash.astar.gui.CheckBoxWidget;
+import org.xflash.astar.gui.PlusMinus;
+import org.xflash.astar.gui.ValueListener;
 
 import java.util.HashSet;
 

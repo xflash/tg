@@ -4,13 +4,12 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
+import org.xflash.astar.gui.ClickableBox;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author rcoqueugniot
- * @since 04.12.15
  */
 public class Toolbar {
 
