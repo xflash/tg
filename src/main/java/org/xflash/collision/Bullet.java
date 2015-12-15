@@ -13,8 +13,9 @@ import java.util.List;
  */
 public class Bullet extends Actor {
 
-    public static final int SPEED = 5;
+    public static final int SPEED = 2;
     public static final int DYING_TIMEOUT = 2000;
+    public static final float RADIUS = 3.f;
     private Shape shape;
     private double angle;
     private int dyingTimeout = 0;
@@ -73,7 +74,7 @@ public class Bullet extends Actor {
     public void spawn(float x, float y, double angle) {
         System.out.println("spawn = " + x + "," + y + " ang: " + angle);
         this.angle = angle;
-        shape = new Circle(x, y, 5.f);
+        shape = new Circle(x, y, RADIUS);
         dyingTimeout = 0;
         exists(true);
     }

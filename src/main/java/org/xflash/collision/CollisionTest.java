@@ -1,9 +1,6 @@
 package org.xflash.collision;
 
-import org.newdawn.slick.BasicGame;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
+import org.newdawn.slick.*;
 
 import java.util.ArrayList;
 
@@ -37,6 +34,8 @@ public class CollisionTest extends BasicGame {
     }
 
     public void render(GameContainer gc, Graphics g) throws SlickException {
+        g.setColor(Color.cyan);
+        g.drawRect(0, 0, gc.getWidth() - 1, gc.getHeight() - 1);
         shooter.render(gc, g);
         target.render(gc, g);
         bulletPool.render(gc, g);

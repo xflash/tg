@@ -16,7 +16,7 @@ public class Shooter {
     public static final int SHOOTING_TIMEOUT = 50;
     private static final boolean DEBUG = true;
     private static final float SPEED = .5f;
-    private static final int SIZE = 5;
+    private static final int SIZE = 15;
     private final BulletPool bulletPool;
 
     private Point target;
@@ -108,12 +108,20 @@ public class Shooter {
     }
 
     private void moveTo(int x, int y) {
-        bbox = new Rectangle(x, y, SIZE, SIZE);
+        if (bbox == null)
+            bbox = new Rectangle(x, y, SIZE, SIZE);
+        bbox.setLocation(x, y);
     }
 
     public void update(GameContainer gc, int delta) {
         float offset = SPEED * delta;
-        bbox.setLocation(bbox.getX() + hmove * offset, bbox.getY() + vmove * offset);
+        float newX = bbox.getX() + hmove * offset;
+        float newY = bbox.getY() + vmove * offset;
+        if (newX >= 0 && (newX + SIZE) <= gc.getWidth() - 1
+                && newY >= 0 && (newY + SIZE) <= gc.getHeight() - 1) {
+            bbox.setLocation(newX, newY);
+        }
+        
         if (shooting) {
             shootingTimeout -= delta;
             if (shootingTimeout < 0) {
