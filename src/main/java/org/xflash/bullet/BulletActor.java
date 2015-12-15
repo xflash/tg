@@ -3,6 +3,7 @@ package org.xflash.bullet;
 import org.lwjgl.util.Point;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.xflash.utils.Actor;
 
 /**
  */

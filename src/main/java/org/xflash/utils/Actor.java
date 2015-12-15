@@ -1,4 +1,4 @@
-package org.xflash.bullet;
+package org.xflash.utils;
 
 
 import org.newdawn.slick.GameContainer;
@@ -15,7 +15,6 @@ public abstract class Actor {
     }
 
     public boolean exists(boolean value) {
-        System.out.println("exists = " + value);
         return _exists = value;
     }
 

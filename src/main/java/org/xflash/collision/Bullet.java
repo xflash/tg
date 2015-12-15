@@ -1,0 +1,64 @@
+package org.xflash.collision;
+
+import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.geom.Circle;
+import org.newdawn.slick.geom.Shape;
+import org.xflash.utils.Actor;
+
+/**
+ */
+public class Bullet extends Actor {
+
+    public static final int SPEED = 2;
+    private Shape shape;
+    private double angle;
+    private int dyingTimeout = 0;
+
+    @Override
+    public void init(Object[] args) {
+
+    }
+
+    @Override
+    public void update(GameContainer gc, int delta) {
+
+        if (dyingTimeout > 0) {
+            dyingTimeout -= delta;
+            if (dyingTimeout < 0) die();
+        } else {
+            float offset = (delta * SPEED) / 10;
+            float xOffset = (float) (Math.cos(angle) * offset);
+            float yOffset = (float) (Math.sin(angle) * offset);
+            shape.setLocation(shape.getX() + xOffset, shape.getY() + yOffset);
+
+            if (shape.getCenterX() < 0 || shape.getCenterY() < 0) dying();
+            if (shape.getCenterX() > gc.getWidth() || shape.getCenterY() > gc.getHeight()) dying();
+
+        }
+    }
+
+    private void dying() {
+        System.out.println("dying ");
+        dyingTimeout = 1000;
+    }
+
+    private void die() {
+        System.out.println("die ");
+        exists(false);
+    }
+
+    @Override
+    public void render(GameContainer gc, Graphics g) {
+        g.setColor(Color.orange);
+        g.fill(shape);
+    }
+
+    public void spawn(float x, float y, double angle) {
+        System.out.println("spawn = " + x + "," + y + " ang: " + angle);
+        this.angle = angle;
+        shape = new Circle(x, y, 5.f);
+        exists(true);
+    }
+}

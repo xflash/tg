@@ -1,4 +1,4 @@
-package org.xflash.bullet;
+package org.xflash.utils;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;

@@ -2,10 +2,11 @@ package org.xflash.bullet;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.xflash.utils.Actor;
 
 /**
  */
-public class Lightning extends Actor{
+public class Lightning extends Actor {
 
     protected double X[];
     protected double Y[];

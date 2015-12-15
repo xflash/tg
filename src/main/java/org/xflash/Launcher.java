@@ -1,7 +1,6 @@
 package org.xflash;
 
 import org.newdawn.slick.AppGameContainer;
-import org.xflash.bullet.LightningTest;
 import org.xflash.collision.CollisionTest;
 
 /**
@@ -13,14 +12,15 @@ public class Launcher {
             // create a new container for our example game. This container
             // just creates a normal native window for rendering OpenGL accelerated
             // elements to
-            AppGameContainer container = new AppGameContainer(
+            AppGameContainer appgc = new AppGameContainer(
 //                    new LightningTest()
                     new CollisionTest()
 //                    new LightningTest()
 //                    new AStarGame()
 //                    new Scroller()
                     , 800, 600, false);
-            container.start();
+            appgc.setMinimumLogicUpdateInterval(1000 / 60);
+            appgc.start();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,5 +1,7 @@
 package org.xflash.bullet;
 
+import org.xflash.utils.ActorPool;
+
 /**
  */
 public class BulletActorPool extends ActorPool<BulletActor> {
