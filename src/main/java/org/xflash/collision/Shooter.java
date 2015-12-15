@@ -7,33 +7,33 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
-import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.util.InputAdapter;
 
 /**
  */
 public class Shooter {
 
+    public static final int SHOOTING_TIMEOUT = 50;
     private static final boolean DEBUG = true;
     private static final float SPEED = .5f;
     private static final int SIZE = 5;
+    private final BulletPool bulletPool;
 
     private Point target;
     private Shape bbox;
     private int hmove=0;
     private int vmove=0;
+    private boolean shooting = false;
+    private int shootingTimeout;
 
     public Shooter(GameContainer gc, int x, int y, final BulletPool bulletPool) {
+        this.bulletPool = bulletPool;
         moveTo(x, y);
         target = new Point(x, y);
 
         gc.getInput().addListener(new InputAdapter() {
-            @Override
-            public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-                target = new Point(newx, newy);
-            }
 
-            
+
             @Override
             public void keyPressed(int key, char c) {
                 System.out.println("keyPressed = " + key);
@@ -58,13 +58,55 @@ public class Shooter {
             }
 
             @Override
+            public void mousePressed(int button, int x, int y) {
+                startShooting();
+            }
+
+            @Override
+            public void mouseReleased(int button, int x, int y) {
+                stopShooting();
+            }
+
+            @Override
+            public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+                moveTarget(newx, newy);
+            }
+
+            @Override
+            public void mouseDragged(int oldx, int oldy, int newx, int newy) {
+                moveTarget(newx, newy);
+            }
+
+            @Override
             public void mouseClicked(int button, int x, int y, int clickCount) {
-                Bullet instance = bulletPool.getInstance();
-                if (instance != null) {
-                    instance.spawn(bbox.getCenterX(), bbox.getCenterY(), getTargetAngle(x, y));
-                }
+//                shoot();
             }
         });
+    }
+
+    private void moveTarget(int newx, int newy) {
+        target = new Point(newx, newy);
+    }
+
+    private void startShooting() {
+        shooting = true;
+        resetShootimngTimeout();
+    }
+
+    private void resetShootimngTimeout() {
+        shootingTimeout = SHOOTING_TIMEOUT;
+    }
+
+    private void stopShooting() {
+        shooting = false;
+        shootingTimeout = 0;
+    }
+
+    private void shoot() {
+        Bullet instance = bulletPool.getInstance();
+        if (instance != null) {
+            instance.spawn(bbox.getCenterX(), bbox.getCenterY(), getTargetAngle(target.getX(), target.getY()));
+        }
     }
 
     private double getTargetAngle(int x, int y) {
@@ -72,15 +114,20 @@ public class Shooter {
         return theta < 0 ? theta + Math.PI * 2 : theta;
     }
 
-
     private void moveTo(int x, int y) {
         bbox = new Rectangle(x, y, SIZE, SIZE);
     }
 
-
     public void update(GameContainer gc, int delta) {
         float offset = SPEED * delta;
-        bbox = bbox.transform(Transform.createTranslateTransform(hmove * offset, vmove*offset));
+        bbox.setLocation(bbox.getX() + hmove * offset, bbox.getY() + vmove * offset);
+        if (shooting) {
+            shootingTimeout -= delta;
+            if (shootingTimeout < 0) {
+                shoot();
+                resetShootimngTimeout();
+            }
+        }
     }
 
     public void render(GameContainer gc, Graphics g) {

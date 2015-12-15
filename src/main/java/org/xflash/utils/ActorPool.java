@@ -94,4 +94,14 @@ public abstract class ActorPool<T extends Actor> {
         }
         actorIdx = 0;
     }
+
+
+    protected int living() {
+        int living = 0;
+        for (T bullet : actor) {
+            if (bullet.exists())
+                living++;
+        }
+        return living;
+    }
 }

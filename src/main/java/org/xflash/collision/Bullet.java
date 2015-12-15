@@ -74,6 +74,7 @@ public class Bullet extends Actor {
         System.out.println("spawn = " + x + "," + y + " ang: " + angle);
         this.angle = angle;
         shape = new Circle(x, y, 5.f);
+        dyingTimeout = 0;
         exists(true);
     }
 }
