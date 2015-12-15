@@ -32,8 +32,6 @@ public class Shooter {
         target = new Point(x, y);
 
         gc.getInput().addListener(new InputAdapter() {
-
-
             @Override
             public void keyPressed(int key, char c) {
                 System.out.println("keyPressed = " + key);
@@ -75,11 +73,6 @@ public class Shooter {
             @Override
             public void mouseDragged(int oldx, int oldy, int newx, int newy) {
                 moveTarget(newx, newy);
-            }
-
-            @Override
-            public void mouseClicked(int button, int x, int y, int clickCount) {
-//                shoot();
             }
         });
     }
