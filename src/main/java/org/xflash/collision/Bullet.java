@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Bullet extends Actor {
 
-    public static final int SPEED = 2;
+    public static final int SPEED = 10;
     public static final int DYING_TIMEOUT = 2000;
     public static final float RADIUS = 3.f;
     private Shape shape;
@@ -35,7 +35,8 @@ public class Bullet extends Actor {
             dyingTimeout -= delta;
             if (dyingTimeout < 0) die();
         } else {
-            float offset = (delta * SPEED) / 10;
+//            float offset = (/*delta * */SPEED) / 10;
+            float offset = SPEED;
             float xOffset = (float) (Math.cos(angle) * offset);
             float yOffset = (float) (Math.sin(angle) * offset);
             shape.setLocation(shape.getX() + xOffset, shape.getY() + yOffset);
@@ -46,7 +47,7 @@ public class Bullet extends Actor {
             for (Collidable collidable : collidables) {
                 if (collidable.collideWith(shape)) {
                     dying();
-                    collidable.handleCollision();
+                    collidable.handleCollision(shape);
                 }
             }
 
@@ -65,14 +66,12 @@ public class Bullet extends Actor {
 
     @Override
     public void render(GameContainer gc, Graphics g) {
-        float alpha = dyingTimeout / DYING_TIMEOUT;
-        g.setColor(dyingTimeout == 0 ? Color.orange : new Color(1.5f, 0.5f, 0.5f, alpha));
-        
+        g.setColor(dyingTimeout == 0 ? Color.orange : new Color(1.5f, 0.5f, 0.5f, (float) (dyingTimeout / DYING_TIMEOUT)));
         g.fill(shape);
     }
 
     public void spawn(float x, float y, double angle) {
-        System.out.println("spawn = " + x + "," + y + " ang: " + angle);
+        System.out.println("spawn = at (" + x + "," + y + ") angle: " + String.format("%.2f", Math.toDegrees(angle)));
         this.angle = angle;
         shape = new Circle(x, y, RADIUS);
         dyingTimeout = 0;

@@ -13,11 +13,12 @@ import org.newdawn.slick.util.InputAdapter;
  */
 public class Shooter {
 
-    public static final int SHOOTING_TIMEOUT = 50;
+    public static final int SHOOTING_TIMEOUT = 200;
     private static final boolean DEBUG = true;
-    private static final float SPEED = .5f;
+    private static final float SPEED = 2.5f;
     private static final int SIZE = 15;
     private final BulletPool bulletPool;
+    private final CanMove canMove;
 
     private Point target;
     private Shape bbox;
@@ -26,8 +27,9 @@ public class Shooter {
     private boolean shooting = false;
     private int shootingTimeout;
 
-    public Shooter(GameContainer gc, int x, int y, final BulletPool bulletPool) {
+    public Shooter(GameContainer gc, int x, int y, final BulletPool bulletPool, CanMove canMove) {
         this.bulletPool = bulletPool;
+        this.canMove = canMove;
         moveTo(x, y);
         target = new Point(x, y);
 
@@ -114,12 +116,11 @@ public class Shooter {
     }
 
     public void update(GameContainer gc, int delta) {
-        float offset = SPEED * delta;
-        float newX = bbox.getX() + hmove * offset;
-        float newY = bbox.getY() + vmove * offset;
-        if (newX >= 0 && (newX + SIZE) <= gc.getWidth() - 1
-                && newY >= 0 && (newY + SIZE) <= gc.getHeight() - 1) {
-            bbox.setLocation(newX, newY);
+        float offset = SPEED /** delta*/;
+        float newX = bbox.getCenterX() + hmove * offset;
+        float newY = bbox.getCenterY() + vmove * offset;
+        if (canMove(gc, newX, newY)) {
+            bbox.setLocation(bbox.getX() + hmove * offset, bbox.getY() + vmove * offset);
         }
         
         if (shooting) {
@@ -129,6 +130,12 @@ public class Shooter {
                 resetShootimngTimeout();
             }
         }
+    }
+
+    private boolean canMove(GameContainer gc, float newX, float newY) {
+        return canMove.canMove((int) newX, (int) newY)
+                && newX >= 0 && (newX + SIZE) <= gc.getWidth() - 1
+                && newY >= 0 && (newY + SIZE) <= gc.getHeight() - 1;
     }
 
     public void render(GameContainer gc, Graphics g) {

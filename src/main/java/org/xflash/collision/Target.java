@@ -33,8 +33,8 @@ public class Target implements Collidable {
         return (this.shape.intersects(shape));
     }
 
-    public void handleCollision() {
+    public void handleCollision(Shape shape) {
         System.out.println("COLLISION ");
-        shape = shape.transform(Transform.createRotateTransform(.10f, shape.getCenterX(), shape.getCenterY()));
+        this.shape = this.shape.transform(Transform.createRotateTransform(.10f, this.shape.getCenterX(), this.shape.getCenterY()));
     }
 }

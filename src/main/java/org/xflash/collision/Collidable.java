@@ -7,5 +7,5 @@ import org.newdawn.slick.geom.Shape;
 public interface Collidable {
     boolean collideWith(Shape shape);
 
-    void handleCollision();
+    void handleCollision(Shape shape);
 }

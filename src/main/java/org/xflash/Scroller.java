@@ -207,7 +207,7 @@ public class Scroller extends BasicGame {
                 widthInTiles + 3, heightInTiles + 3);
 
         // draw entities relative to the player that must appear in the centre of the screen
-        g.translate(400 - (int) (playerX * 32), 300 - (int) (playerY * 32));
+        g.translate(400 - (int) (playerX * TILE_SIZE), 300 - (int) (playerY * TILE_SIZE));
 
         drawTank(g, playerX, playerY, ang);
         // draw other entities here if there were any
