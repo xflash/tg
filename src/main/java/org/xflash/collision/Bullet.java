@@ -15,7 +15,7 @@ public class Bullet extends Actor {
 
     public static final int SPEED = 10;
     public static final int DYING_TIMEOUT = 2000;
-    public static final float RADIUS = 3.f;
+    public static final float RADIUS = 2.5f;
     private Shape shape;
     private double angle;
     private int dyingTimeout = 0;
@@ -75,8 +75,14 @@ public class Bullet extends Actor {
     public void spawn(float x, float y, double angle) {
         System.out.println("spawn = at (" + x + "," + y + ") angle: " + String.format("%.2f", Math.toDegrees(angle)));
         this.angle = angle;
-        shape = new Circle(x, y, RADIUS);
+        moveTo(x, y);
         dyingTimeout = 0;
         exists(true);
+    }
+
+    private void moveTo(float x, float y) {
+        if (shape == null)
+            shape = new Circle(x, y, RADIUS);
+        shape.setLocation(x, y);
     }
 }

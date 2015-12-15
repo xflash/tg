@@ -15,7 +15,7 @@ public class GameMap implements CanMove, Collidable {
     public static final int LAYER_INDEX = 0;
     public static final String BLOCKED = "blocked";
     public static final int LAYER1_INDEX = 1;
-
+    private final static boolean DEBUG = false;
     private final TiledMap map;
     private final AStarPathFinder pathFinder;
     private boolean[][] blocked;
@@ -116,11 +116,13 @@ public class GameMap implements CanMove, Collidable {
         int xtiles = gc.getWidth() / map.getTileWidth();
         int ytiles = 1 + (gc.getHeight() / map.getTileHeight());
         map.render(0, 0, 0, 0, xtiles, ytiles);
-        for (int x = 0; x < blocked.length && x < xtiles; x++) {
-            boolean[] row = blocked[x];
-            for (int y = 0; y < row.length && y < ytiles; y++) {
-                g.setColor(row[y] ? Color.red : Color.green);
-                g.drawRect(x * map.getTileWidth(), y * map.getTileHeight(), map.getTileWidth() - 1, map.getTileHeight() - 1);
+        if (DEBUG) {
+            for (int x = 0; x < blocked.length && x < xtiles; x++) {
+                boolean[] row = blocked[x];
+                for (int y = 0; y < row.length && y < ytiles; y++) {
+                    g.setColor(row[y] ? Color.red : Color.green);
+                    g.drawRect(x * map.getTileWidth(), y * map.getTileHeight(), map.getTileWidth() - 1, map.getTileHeight() - 1);
+                }
             }
         }
     }
@@ -149,6 +151,6 @@ public class GameMap implements CanMove, Collidable {
     public void setFinish(int x, int y) {
         fx = x / map.getTileWidth();
         fy = y / map.getTileHeight();
-        
+
     }
 }
