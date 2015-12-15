@@ -4,14 +4,14 @@ import org.newdawn.slick.*;
 
 /**
  */
-public class BulletGame extends BasicGame {
+public class LightningTest extends BasicGame {
 
     private LightningPool lightningPool;
     private BulletActorPool pool;
     private EffectPool effectPool;
 
-    public BulletGame() {
-        super("BulletGame");
+    public LightningTest() {
+        super("LightningTest");
     }
 
     @Override
