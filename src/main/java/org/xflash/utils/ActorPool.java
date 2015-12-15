@@ -12,7 +12,7 @@ import java.util.List;
  */
 public abstract class ActorPool<T extends Actor> {
     protected int actorIdx = 0;
-    private T[] actor;
+    protected T[] actor;
 
 
     public ActorPool(int n, Class<T> clazz) {

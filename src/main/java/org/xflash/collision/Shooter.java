@@ -8,10 +8,11 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.util.InputAdapter;
+import org.newdawn.slick.util.pathfinding.Mover;
 
 /**
  */
-public class Shooter {
+public class Shooter implements Mover {
 
     public static final int SHOOTING_TIMEOUT = 200;
     private static final boolean DEBUG = true;
@@ -27,7 +28,7 @@ public class Shooter {
     private boolean shooting = false;
     private int shootingTimeout;
 
-    public Shooter(GameContainer gc, int x, int y, final BulletPool bulletPool, CanMove canMove) {
+    public Shooter(GameContainer gc, int x, int y, final BulletPool bulletPool, CanMove canMove, final RightClickHandler rightClickHandler) {
         this.bulletPool = bulletPool;
         this.canMove = canMove;
         moveTo(x, y);
@@ -59,12 +60,14 @@ public class Shooter {
 
             @Override
             public void mousePressed(int button, int x, int y) {
-                startShooting();
+                if (button == 0) startShooting();
+                if (button == 1) rightClickHandler.mousePressed(x, y);
             }
 
             @Override
             public void mouseReleased(int button, int x, int y) {
-                stopShooting();
+                if (button == 0) stopShooting();
+                if (button == 1) rightClickHandler.mouseReleased(x, y);
             }
 
             @Override

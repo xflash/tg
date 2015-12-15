@@ -17,8 +17,8 @@ public class BulletPool extends ActorPool<Bullet> {
     @Override
     public void render(GameContainer gc, Graphics g) {
         super.render(gc, g);
-        g.setColor(Color.magenta);
-        g.drawString(String.format("Bullets :%d", living()), 200, 20);
+        g.setColor(Color.white);
+        g.drawString(String.format("Bullets :%d/%d", living(), actor.length), 200, 10);
     }
 
 }

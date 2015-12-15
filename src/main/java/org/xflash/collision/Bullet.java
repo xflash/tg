@@ -61,12 +61,14 @@ public class Bullet extends Actor {
 
     private void die() {
         System.out.println("die ");
+        dyingTimeout = 0;        
         exists(false);
     }
 
     @Override
     public void render(GameContainer gc, Graphics g) {
-        g.setColor(dyingTimeout == 0 ? Color.orange : new Color(1.5f, 0.5f, 0.5f, (float) (dyingTimeout / DYING_TIMEOUT)));
+        g.setColor(Color.orange);
+//        g.setColor(dyingTimeout == 0 ? Color.orange : new Color(1.5f, 0.5f, 0.5f, (float) (dyingTimeout / DYING_TIMEOUT)));
         g.fill(shape);
     }
 
