@@ -5,6 +5,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
+import java.util.ArrayList;
+
 /**
  */
 public class CollisionTest extends BasicGame {
@@ -12,6 +14,7 @@ public class CollisionTest extends BasicGame {
     private Shooter shooter;
     private Target target;
     private BulletPool bulletPool;
+    private ArrayList<Collidable> collidables;
 
     public CollisionTest() {
         super("Collision");
@@ -19,9 +22,11 @@ public class CollisionTest extends BasicGame {
 
     @Override
     public void init(GameContainer gc) throws SlickException {
-        bulletPool = new BulletPool(100);
+        collidables = new ArrayList<Collidable>();
+        bulletPool = new BulletPool(100, collidables);
         shooter = new Shooter(gc, 100, 400, bulletPool);
         target = new Target(gc, 300, 200);
+        collidables.add(target);
     }
 
     @Override
