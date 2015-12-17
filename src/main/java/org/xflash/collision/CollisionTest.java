@@ -26,18 +26,24 @@ public class CollisionTest extends BasicGame {
         bulletPool = new BulletPool(100, collidables);
         target = new Target(gc, 300, 200);
         collidables.add(target);
-        gameMap = new GameMap();
+        gameMap = new GameMap(gc);
         shooter = new Shooter(gc, gameMap.getStartX(), gameMap.getStartY(), bulletPool, gameMap, new RightClickHandler() {
             public void mousePressed(int x, int y) {
             }
 
             public void mouseReleased(int x, int y) {
                 gameMap.setFinish(x, y);
-                path = gameMap.buildPath(shooter);
+                path = gameMap.buildPath(shooter, shooter.getCenterX(), shooter.getCenterY());
             }
         });
-        path = gameMap.buildPath(shooter);
+        path = gameMap.buildPath(shooter, shooter.getCenterX(), shooter.getCenterY());
         collidables.add(gameMap);
+    }
+
+    @Override
+    public void keyReleased(int key, char c) {
+        path = gameMap.buildPath(shooter, shooter.getCenterX(), shooter.getCenterY());
+
     }
 
     @Override
@@ -51,8 +57,12 @@ public class CollisionTest extends BasicGame {
         g.setColor(Color.cyan);
         g.drawRect(0, 0, gc.getWidth() - 1, gc.getHeight() - 1);
 
-        gameMap.render(gc, g, path);
+        gameMap.render(gc, g, shooter.getCenterX(), shooter.getCenterY());
+
         shooter.render(gc, g);
+
+        gameMap.renderPath(gc,g,path);
+
         target.render(gc, g);
         bulletPool.render(gc, g);
     }

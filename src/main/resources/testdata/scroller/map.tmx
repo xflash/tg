@@ -10,12 +10,12 @@
  </tileset>
  <layer name="Layer 0" width="50" height="50">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3YSxICIQxFUWzd/5pdgZLPfYGmM8isDTmQQJXXGOM6LF7O2HENb37rOtG8UY9iDcpQtW/vH6FwRPfO4qw8j6zD+s2ullMcs96quhfV/ex1VNzFFQbSQ+XOOrKe3RyKnq6sXdnXq86DdCj6tNoRNdCmdnCOyt6iZ4OcjwoHWWvWEvl9Zf1WizXHZ2H9ZD3t8PWHtU/u4phZVjrIu/upDur9oN9Sj4N8t3d3WC2kQeWYrUsb6PlQOSz5o/dO1EEYSMespor/1ynHP4v6PIiZmtWlng2F5amOu/RWZg9Ib2bmFXGCQdHTHR0dHR0d3vgC8P5qohAnAAA=
+   H4sIAAAAAAAAA+3YSxICIQxFUWzd/5pdgZLPfYGmM8isDTmQQJXXGOM6LF7O2HENb37rOtG8UY9iDcpQtW/vH6FwRPfO4qw8j6zD+s2ullMcs96quhfV/ex1VNzFFQbSQ+XOOrKe3RyKnq6sXdnXq86DdCj6tNoRNdCmdnCOyt6iZ4OcjwoHWWvWEvl9Zf1WizXHZ2H9ZD3t8PWHtU/u4phZVjrIu/upDur9oN9Sj4N8t3d3WC2kQeWYrUsb6PlQOSz5o/dO1EEYSMespor/1ynHP4v6PIiZmtWlng2F5amOu/RWZg9Ib2bmFXGCQdHTHR0dHR0d3vgC8P5qohAnAAA=
   </data>
  </layer>
  <layer name="Layer 1" width="50" height="50">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3OMQ0AAAgDMB7wLxkHvCRLq6BVefo7AECk+Q4AAAAAAAAAAKcF2HLyMhAnAAA=
+   H4sIAAAAAAAAA+3OMQ0AAAgDMB7wLxkHvCRLq6BVefo7AECk+Q4AAAAAAAAAAKcF2HLyMhAnAAA=
   </data>
  </layer>
 </map>

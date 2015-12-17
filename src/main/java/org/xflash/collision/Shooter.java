@@ -22,7 +22,7 @@ public class Shooter implements Mover {
     private final CanMove canMove;
 
     private Point target;
-    private Shape bbox;
+    private Shape shape;
     private int hmove=0;
     private int vmove=0;
     private boolean shooting = false;
@@ -103,29 +103,29 @@ public class Shooter implements Mover {
     private void shoot() {
         Bullet instance = bulletPool.getInstance();
         if (instance != null) {
-            instance.spawn(bbox.getCenterX(), bbox.getCenterY(), getTargetAngle(target.getX(), target.getY()));
+            instance.spawn(shape.getCenterX(), shape.getCenterY(), getTargetAngle(target.getX(), target.getY()));
         }
     }
 
     private double getTargetAngle(int x, int y) {
-        double theta = Math.atan2(y - bbox.getCenterY(), x - bbox.getCenterX());
+        double theta = Math.atan2(y - shape.getCenterY(), x - shape.getCenterX());
         return theta < 0 ? theta + Math.PI * 2 : theta;
     }
 
     private void moveTo(int x, int y) {
-        if (bbox == null)
-            bbox = new Rectangle(x, y, SIZE, SIZE);
-        bbox.setLocation(x, y);
+        if (shape == null)
+            shape = new Rectangle(x, y, SIZE, SIZE);
+        shape.setLocation(x, y);
     }
 
     public void update(GameContainer gc, int delta) {
         float offset = SPEED /** delta*/;
-        float newX = bbox.getCenterX() + hmove * offset;
-        float newY = bbox.getCenterY() + vmove * offset;
+        float newX = shape.getCenterX() + hmove * offset;
+        float newY = shape.getCenterY() + vmove * offset;
         if (canMove(gc, newX, newY)) {
-            bbox.setLocation(bbox.getX() + hmove * offset, bbox.getY() + vmove * offset);
+            shape.setLocation(shape.getX() + hmove * offset, shape.getY() + vmove * offset);
         }
-        
+
         if (shooting) {
             shootingTimeout -= delta;
             if (shootingTimeout < 0) {
@@ -143,9 +143,9 @@ public class Shooter implements Mover {
 
     public void render(GameContainer gc, Graphics g) {
         g.setColor(Color.red);
-        g.draw(bbox);
+        g.draw(shape);
         g.setColor(Color.yellow);
-        g.drawLine(bbox.getCenterX(), bbox.getCenterY(), target.getX(), target.getY());
+        g.drawLine(shape.getCenterX(), shape.getCenterY(), target.getX(), target.getY());
 
         if (DEBUG) {
             g.setColor(Color.magenta);
@@ -154,7 +154,15 @@ public class Shooter implements Mover {
     }
 
     private int calcDistance() {
-        float[] center = bbox.getCenter();
+        float[] center = shape.getCenter();
         return (int) Math.sqrt(Math.pow(target.getX()- center[0], 2) + Math.pow(target.getY()- center[1], 2));
+    }
+
+    public float getCenterX() {
+        return shape.getCenterX();
+    }
+
+    public float getCenterY() {
+        return shape.getCenterY();
     }
 }
