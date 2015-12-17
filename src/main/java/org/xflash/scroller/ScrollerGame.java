@@ -1,4 +1,4 @@
-package org.xflash;
+package org.xflash.scroller;
 
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
@@ -6,7 +6,7 @@ import org.newdawn.slick.util.Log;
 
 /**
  */
-public class Scroller extends BasicGame {
+public class ScrollerGame extends BasicGame {
 
     /** The size of the tank sprite - used for finding the centre */
     private static final int TANK_SIZE = 32;
@@ -49,9 +49,9 @@ public class Scroller extends BasicGame {
     private boolean[][] blocked;
 
     /**
-     * Scroller example
+     * ScrollerGame example
      */
-    public Scroller() {
+    public ScrollerGame() {
         super("Scroller");
     }
 
@@ -62,7 +62,7 @@ public class Scroller extends BasicGame {
         // load the sprites and tiles, note that underneath the texture
         // will be shared between the sprite sheet and tilemap
         SpriteSheet sheet = new SpriteSheet("testdata/scroller/sprites.png",32,32);
-        // load the tilemap created the TileD tool 
+        // load the tilemap created the TileD tool
         map = new TiledMap("testdata/scroller/map.tmx");
 
         // build a collision map based on tile properties in the TileD map
@@ -103,7 +103,7 @@ public class Scroller extends BasicGame {
      * @see org.newdawn.slick.BasicGame#update(org.newdawn.slick.GameContainer, int)
      */
     public void update(GameContainer container, int delta) throws SlickException {
-        // check the controls, left/right adjust the rotation of the tank, up/down 
+        // check the controls, left/right adjust the rotation of the tank, up/down
         // move backwards and forwards
         if (container.getInput().isKeyDown(Input.KEY_LEFT)) {
             ang -= delta * TANK_ROTATE_SPEED;
@@ -128,7 +128,7 @@ public class Scroller extends BasicGame {
     }
 
     /**
-     * Check if a specific location of the tank would leave it 
+     * Check if a specific location of the tank would leave it
      * on a blocked tile
      *
      * @param x The x coordinate of the tank's location
@@ -152,7 +152,7 @@ public class Scroller extends BasicGame {
         float newy = playerY + y;
 
         // first we try the real move, if that doesn't work
-        // we try moving on just one of the axis (X and then Y) 
+        // we try moving on just one of the axis (X and then Y)
         // this allows us to slide against edges
         if (blocked(newx,newy)) {
             if (blocked(newx, playerY)) {
@@ -233,5 +233,5 @@ public class Scroller extends BasicGame {
         g.rotate(cx,cy,-rot);
     }
 
-    
+
 }

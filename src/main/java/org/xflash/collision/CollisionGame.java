@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  */
-public class CollisionTest extends BasicGame {
+public class CollisionGame extends BasicGame {
 
     private Shooter shooter;
     private Target target;
@@ -16,7 +16,7 @@ public class CollisionTest extends BasicGame {
     private Path path;
     private GameMap gameMap;
 
-    public CollisionTest() {
+    public CollisionGame() {
         super("COLL");
     }
 
