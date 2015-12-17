@@ -2,6 +2,7 @@ package org.xflash;
 
 import org.newdawn.slick.AppGameContainer;
 import org.xflash.collision.CollisionGame;
+import org.xflash.detection.DetectionGame;
 
 /**
  */
@@ -14,7 +15,8 @@ public class Launcher {
             // elements to
             AppGameContainer appgc = new AppGameContainer(
 //                    new LightningTest()
-                    new CollisionGame()
+                    new DetectionGame()
+//                    new CollisionGame()
 //                    new LightningTest()
 //                    new AStarGame()
 //                    new ScrollerGame()

@@ -9,6 +9,7 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.util.InputAdapter;
 import org.newdawn.slick.util.pathfinding.Mover;
+import org.xflash.utils.AngleUtils;
 
 /**
  */
@@ -23,8 +24,8 @@ public class Shooter implements Mover {
 
     private Point target;
     private Shape shape;
-    private int hmove=0;
-    private int vmove=0;
+    private int hmove = 0;
+    private int vmove = 0;
     private boolean shooting = false;
     private int shootingTimeout;
 
@@ -39,20 +40,35 @@ public class Shooter implements Mover {
             public void keyPressed(int key, char c) {
                 System.out.println("keyPressed = " + key);
                 switch (key) {
-                    case Input.KEY_LEFT: hmove = -1; break;
-                    case Input.KEY_RIGHT: hmove = 1; break;
-                    case Input.KEY_UP: vmove = -1; break;
-                    case Input.KEY_DOWN: vmove = 1; break;
+                    case Input.KEY_LEFT:
+                        hmove = -1;
+                        break;
+                    case Input.KEY_RIGHT:
+                        hmove = 1;
+                        break;
+                    case Input.KEY_UP:
+                        vmove = -1;
+                        break;
+                    case Input.KEY_DOWN:
+                        vmove = 1;
+                        break;
                     default:
                         break;
                 }
             }
+
             @Override
             public void keyReleased(int key, char c) {
                 System.out.println("keyReleased = " + key);
                 switch (key) {
-                    case Input.KEY_LEFT: case Input.KEY_RIGHT: hmove = 0; break;
-                    case Input.KEY_UP: case Input.KEY_DOWN: vmove = 0; break;
+                    case Input.KEY_LEFT:
+                    case Input.KEY_RIGHT:
+                        hmove = 0;
+                        break;
+                    case Input.KEY_UP:
+                    case Input.KEY_DOWN:
+                        vmove = 0;
+                        break;
                     default:
                         break;
                 }
@@ -60,14 +76,20 @@ public class Shooter implements Mover {
 
             @Override
             public void mousePressed(int button, int x, int y) {
-                if (button == 0) startShooting();
-                if (button == 1) rightClickHandler.mousePressed(x, y);
+                if (button == 0) {
+                    shooting = true;
+                    resetShootimngTimeout();
+                }
+                if (button == 1 && rightClickHandler != null) rightClickHandler.mousePressed(x, y);
             }
 
             @Override
             public void mouseReleased(int button, int x, int y) {
-                if (button == 0) stopShooting();
-                if (button == 1) rightClickHandler.mouseReleased(x, y);
+                if (button == 0) {
+                    shooting = false;
+                    shootingTimeout = 0;
+                }
+                if (button == 1 && rightClickHandler != null) rightClickHandler.mouseReleased(x, y);
             }
 
             @Override
@@ -82,34 +104,24 @@ public class Shooter implements Mover {
         });
     }
 
-    private void moveTarget(int newx, int newy) {
-        target = new Point(newx, newy);
+    public Shooter(GameContainer container, int x, int y) {
+        this(container, x, y, null, null, null);
     }
 
-    private void startShooting() {
-        shooting = true;
-        resetShootimngTimeout();
+    private void moveTarget(int newx, int newy) {
+        target = new Point(newx, newy);
     }
 
     private void resetShootimngTimeout() {
         shootingTimeout = SHOOTING_TIMEOUT;
     }
 
-    private void stopShooting() {
-        shooting = false;
-        shootingTimeout = 0;
-    }
-
     private void shoot() {
+        if (bulletPool == null) return;
         Bullet instance = bulletPool.getInstance();
         if (instance != null) {
-            instance.spawn(shape.getCenterX(), shape.getCenterY(), getTargetAngle(target.getX(), target.getY()));
+            instance.spawn(shape.getCenterX(), shape.getCenterY(), AngleUtils.getTargetAngle(target.getX(), target.getY(), shape.getCenterX(), shape.getCenterY()));
         }
-    }
-
-    private double getTargetAngle(int x, int y) {
-        double theta = Math.atan2(y - shape.getCenterY(), x - shape.getCenterX());
-        return theta < 0 ? theta + Math.PI * 2 : theta;
     }
 
     private void moveTo(int x, int y) {
@@ -136,9 +148,9 @@ public class Shooter implements Mover {
     }
 
     private boolean canMove(GameContainer gc, float newX, float newY) {
-        return canMove.canMove((int) newX, (int) newY)
-                && newX >= 0 && (newX + SIZE) <= gc.getWidth() - 1
-                && newY >= 0 && (newY + SIZE) <= gc.getHeight() - 1;
+        return newX >= 0 && (newX + SIZE) <= gc.getWidth() - 1
+                && newY >= 0 && (newY + SIZE) <= gc.getHeight() - 1
+                && (canMove == null || canMove.canMove((int) newX, (int) newY));
     }
 
     public void render(GameContainer gc, Graphics g) {
@@ -149,13 +161,13 @@ public class Shooter implements Mover {
 
         if (DEBUG) {
             g.setColor(Color.magenta);
-            g.drawString(String.format("dist: %d", calcDistance()), target.getX()+10, target.getY());
+            g.drawString(String.format("dist: %d", calcDistance()), target.getX() + 10, target.getY());
         }
     }
 
     private int calcDistance() {
         float[] center = shape.getCenter();
-        return (int) Math.sqrt(Math.pow(target.getX()- center[0], 2) + Math.pow(target.getY()- center[1], 2));
+        return (int) Math.sqrt(Math.pow(target.getX() - center[0], 2) + Math.pow(target.getY() - center[1], 2));
     }
 
     public float getCenterX() {
