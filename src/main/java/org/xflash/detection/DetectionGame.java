@@ -5,6 +5,7 @@ import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.xflash.collision.Shooter;
+import org.xflash.collision.Sightable;
 
 import java.util.ArrayList;
 
@@ -23,10 +24,14 @@ public class DetectionGame extends BasicGame {
 
     @Override
     public void init(GameContainer container) throws SlickException {
-        foo = new Foo(50, 50);
+        ArrayList<Sightable> sightables = new ArrayList<Sightable>();
+        foo = new Foo(sightables);
+        foo.moveTo(50, 50);
+
         path = buildPath();
         foo.follow(path);
         shooter = new Shooter(container, container.getWidth() / 2, container.getHeight() / 2);
+        sightables.add(shooter);
     }
 
     private Path buildPath() {

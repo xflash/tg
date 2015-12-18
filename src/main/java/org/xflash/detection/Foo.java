@@ -4,16 +4,18 @@ import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.util.pathfinding.Path;
+import org.xflash.collision.Sightable;
 import org.xflash.utils.AngleUtils;
+
+import java.util.List;
 
 /**
  */
 public class Foo {
     private static final int SIGHT_RADIUS = 50;
     private static final int SIZE = 15;
-//    private final Vector2f position = new Vector2f();
+    //    private final Vector2f position = new Vector2f();
     private final Sight sight;
     private final Vector2f location = new Vector2f();
     private Path path;
@@ -21,9 +23,8 @@ public class Foo {
     private double moveAngle;
     private float speed = .10f;
 
-    public Foo(int x, int y) {
-        sight = new Sight(SIGHT_RADIUS);
-        moveTo(x, y);
+    public Foo(List<Sightable> sightables) {
+        sight = new Sight(SIGHT_RADIUS, sightables);
     }
 
     public void moveTo(float x, float y) {
@@ -34,8 +35,14 @@ public class Foo {
 
     public void update(GameContainer container, int delta) {
 
+        updatePath(delta);
+
+        sight.update(container, delta);
+    }
+
+    private boolean updatePath(int delta) {
         if (pathIdx < 0)
-            return;
+            return true;
         Path.Step step = path.getStep(pathIdx);
 
         if (goToStep(step, delta)) {
@@ -44,39 +51,34 @@ public class Foo {
                 System.out.println("Resting to step 0");
                 pathIdx = 0;
             }
-            System.out.println("Moving to next step "+ pathIdx);
+            System.out.println("Moving to next step " + pathIdx);
             resetAngle();
         }
-
-        sight.update(container, delta);
+        return false;
     }
 
     private void resetAngle() {
         Path.Step step = path.getStep(pathIdx);
         moveAngle = AngleUtils.getTargetAngle(step.getX(), step.getY(), location.x, location.y);
         sight.lookAt(moveAngle);
-
     }
 
     private boolean goToStep(Path.Step step, int delta) {
 
-        float dx = (float) (Math.cos(moveAngle) * speed*delta);
-        float dy = (float) (Math.sin(moveAngle) * speed*delta);
-        moveTo(location.x + dx,  location.y + dy);
+        float dx = (float) (Math.cos(moveAngle) * speed * delta);
+        float dy = (float) (Math.sin(moveAngle) * speed * delta);
+        moveTo(location.x + dx, location.y + dy);
 
         float xDelta = location.x - step.getX();
         float yDelta = location.y - step.getY();
         return xDelta * xDelta + yDelta * yDelta < 9;
-
-
     }
-
 
 
     public void render(GameContainer container, Graphics g) {
         g.setColor(Color.gray);
 //        g.drawLine(position.x, position.y, position.x, position.y);
-        g.drawRect(location.x-SIZE/2, location.y-SIZE/2, SIZE, SIZE);
+        g.drawRect(location.x - SIZE / 2, location.y - SIZE / 2, SIZE, SIZE);
         sight.render(container, g);
     }
 

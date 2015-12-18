@@ -1,6 +1,7 @@
 package org.xflash.collision;
 
 import org.lwjgl.util.Point;
+import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -13,7 +14,7 @@ import org.xflash.utils.AngleUtils;
 
 /**
  */
-public class Shooter implements Mover {
+public class Shooter implements Mover, Sightable {
 
     public static final int SHOOTING_TIMEOUT = 200;
     private static final boolean DEBUG = true;
@@ -22,18 +23,23 @@ public class Shooter implements Mover {
     private final BulletPool bulletPool;
     private final CanMove canMove;
 
-    private Point target;
-    private Shape shape;
+//    private Shape shape;
     private int hmove = 0;
     private int vmove = 0;
     private boolean shooting = false;
     private int shootingTimeout;
+    private Vector2f position = new Vector2f();
+    private Vector2f target=new Vector2f();
+
+    public Shooter(GameContainer container, int x, int y) {
+        this(container, x, y, null, null, null);
+    }
 
     public Shooter(GameContainer gc, int x, int y, final BulletPool bulletPool, CanMove canMove, final RightClickHandler rightClickHandler) {
         this.bulletPool = bulletPool;
         this.canMove = canMove;
         moveTo(x, y);
-        target = new Point(x, y);
+        moveTarget(x,y);
 
         gc.getInput().addListener(new InputAdapter() {
             @Override
@@ -104,12 +110,8 @@ public class Shooter implements Mover {
         });
     }
 
-    public Shooter(GameContainer container, int x, int y) {
-        this(container, x, y, null, null, null);
-    }
-
-    private void moveTarget(int newx, int newy) {
-        target = new Point(newx, newy);
+    private void moveTarget(float newx, float newy) {
+        target.set(newx, newy);
     }
 
     private void resetShootimngTimeout() {
@@ -120,22 +122,22 @@ public class Shooter implements Mover {
         if (bulletPool == null) return;
         Bullet instance = bulletPool.getInstance();
         if (instance != null) {
-            instance.spawn(shape.getCenterX(), shape.getCenterY(), AngleUtils.getTargetAngle(target.getX(), target.getY(), shape.getCenterX(), shape.getCenterY()));
+            instance.spawn(position.getX(), position.getY(),
+                    AngleUtils.getTargetAngle(position.getX(), position.getY(), target.getX(), target.getY()));
         }
     }
 
-    private void moveTo(int x, int y) {
-        if (shape == null)
-            shape = new Rectangle(x, y, SIZE, SIZE);
-        shape.setLocation(x, y);
+    private void moveTo(float x, float y) {
+        position.set(x, y);
     }
 
     public void update(GameContainer gc, int delta) {
         float offset = SPEED /** delta*/;
-        float newX = shape.getCenterX() + hmove * offset;
-        float newY = shape.getCenterY() + vmove * offset;
+        float newX = position.getX() + hmove * offset;
+        float newY = position.getY() + vmove * offset;
         if (canMove(gc, newX, newY)) {
-            shape.setLocation(shape.getX() + hmove * offset, shape.getY() + vmove * offset);
+            moveTo(position.getX() + hmove * offset,
+                    position.getY() + vmove * offset);
         }
 
         if (shooting) {
@@ -155,9 +157,9 @@ public class Shooter implements Mover {
 
     public void render(GameContainer gc, Graphics g) {
         g.setColor(Color.red);
-        g.draw(shape);
+        g.drawRect(position.x - SIZE / 2, position.y - SIZE/2, SIZE, SIZE);
         g.setColor(Color.yellow);
-        g.drawLine(shape.getCenterX(), shape.getCenterY(), target.getX(), target.getY());
+        g.drawLine(position.getX(), position.getY(), target.getX(), target.getY());
 
         if (DEBUG) {
             g.setColor(Color.magenta);
@@ -166,15 +168,12 @@ public class Shooter implements Mover {
     }
 
     private int calcDistance() {
-        float[] center = shape.getCenter();
-        return (int) Math.sqrt(Math.pow(target.getX() - center[0], 2) + Math.pow(target.getY() - center[1], 2));
+        float dx = target.getX() - position.getX();
+        float dy = target.getY() - position.getY();
+        return (int) Math.sqrt(dx*dx + dy*dy);
     }
 
-    public float getCenterX() {
-        return shape.getCenterX();
-    }
-
-    public float getCenterY() {
-        return shape.getCenterY();
+    public Vector2f getPosition() {
+        return position;
     }
 }

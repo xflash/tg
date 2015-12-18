@@ -33,16 +33,16 @@ public class CollisionGame extends BasicGame {
 
             public void mouseReleased(int x, int y) {
                 gameMap.setFinish(x, y);
-                path = gameMap.buildPath(shooter, shooter.getCenterX(), shooter.getCenterY());
+                path = gameMap.buildPath(shooter, shooter.getPosition().getX(), shooter.getPosition().getY());
             }
         });
-        path = gameMap.buildPath(shooter, shooter.getCenterX(), shooter.getCenterY());
+        path = gameMap.buildPath(shooter, shooter.getPosition().getX(), shooter.getPosition().getY());
         collidables.add(gameMap);
     }
 
     @Override
     public void keyReleased(int key, char c) {
-        path = gameMap.buildPath(shooter, shooter.getCenterX(), shooter.getCenterY());
+        path = gameMap.buildPath(shooter, shooter.getPosition().getX(), shooter.getPosition().getY());
 
     }
 
@@ -57,7 +57,7 @@ public class CollisionGame extends BasicGame {
         g.setColor(Color.cyan);
         g.drawRect(0, 0, gc.getWidth() - 1, gc.getHeight() - 1);
 
-        gameMap.render(gc, g, shooter.getCenterX(), shooter.getCenterY());
+        gameMap.render(gc, g, shooter.getPosition().getX(), shooter.getPosition().getY());
 
         shooter.render(gc, g);
 
