@@ -18,6 +18,8 @@ public class Sight {
     private final int radius;
     private int sightTurn;
     private double sightAngle;
+    private double sightAngleTarget;
+    private double sightDelta;
 
     public Sight(int radius) {
         this.radius = radius;
@@ -46,7 +48,12 @@ public class Sight {
     void update(GameContainer container, int delta) {
         sightTurn += delta;
         double v = (double) sightTurn % (2 * SIGHT_LENGTH);
-//        sightAngle += sightTurn*.2f;
+
+//            sightAngle+=sightDelta;
+//            if(sightAngle>sightAngleTarget) {
+//                sightAngle = sightAngleTarget;
+//        }
+
     }
 
     public void render(GameContainer container, Graphics g) {
@@ -62,5 +69,14 @@ public class Sight {
 
         g.setColor(Color.orange);
 //        g.drawLine(location.x, location.y, (float) (location.x + Math.cos(moveAngle) * SIGHT_RADIUS), (float) (centerY + Math.sin(moveAngle) * SIGHT_RADIUS));
+    }
+
+    public void lookAt(double angle) {
+        System.out.println("lookAt = " + Math.toDegrees(angle)+" sightAngle: "+String.format("%.2f",Math.toDegrees(sightAngle)));
+        this.sightAngle=angle;
+//        this.sightAngleTarget=angle;
+//        sightDelta = (sightAngleTarget - sightAngle)/16;
+
+
     }
 }

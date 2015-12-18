@@ -5,7 +5,6 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
-import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.xflash.utils.AngleUtils;
 
@@ -13,25 +12,24 @@ import org.xflash.utils.AngleUtils;
  */
 public class Foo {
     private static final int SIGHT_RADIUS = 50;
-    private final Vector2f position;
+    private static final int SIZE = 15;
+//    private final Vector2f position = new Vector2f();
     private final Sight sight;
+    private final Vector2f location = new Vector2f();
     private Path path;
     private int pathIdx;
-    private final Rectangle shape;
     private double moveAngle;
-    private float speed;
+    private float speed = .10f;
 
     public Foo(int x, int y) {
-        shape = new Rectangle(x, y, 15, 15);
-        position = new Vector2f();
         sight = new Sight(SIGHT_RADIUS);
         moveTo(x, y);
     }
 
-    public void moveTo(int x, int y) {
-        shape.setLocation(x, y);
-        position.set(x, y);
-        sight.moveTo(shape.getCenterX(), shape.getCenterY());
+    public void moveTo(float x, float y) {
+//        position.set(x, y);
+        location.set(x, y);
+        sight.moveTo(location.x, location.y);
     }
 
     public void update(GameContainer container, int delta) {
@@ -47,28 +45,38 @@ public class Foo {
                 pathIdx = 0;
             }
             System.out.println("Moving to next step "+ pathIdx);
+            resetAngle();
         }
 
         sight.update(container, delta);
     }
 
+    private void resetAngle() {
+        Path.Step step = path.getStep(pathIdx);
+        moveAngle = AngleUtils.getTargetAngle(step.getX(), step.getY(), location.x, location.y);
+        sight.lookAt(moveAngle);
+
+    }
+
     private boolean goToStep(Path.Step step, int delta) {
-        moveAngle = AngleUtils.getTargetAngle(step.getX(), step.getY(), shape.getCenterX(), shape.getCenterY());
-        speed = .20f;
-        double dx = Math.cos(moveAngle) * delta * speed;
-        double dy = Math.sin(moveAngle) * delta * speed;
-        moveTo((int) (shape.getX() + dx), (int) (shape.getY() + dy));
 
-        Circle circle = new Circle(step.getX(), step.getY(), 3);
+        float dx = (float) (Math.cos(moveAngle) * speed*delta);
+        float dy = (float) (Math.sin(moveAngle) * speed*delta);
+        moveTo(location.x + dx,  location.y + dy);
 
-        return circle.contains(shape.getCenterX(), circle.getCenterY());
+        float xDelta = location.x - step.getX();
+        float yDelta = location.y - step.getY();
+        return xDelta * xDelta + yDelta * yDelta < 9;
+
+
     }
 
 
 
     public void render(GameContainer container, Graphics g) {
         g.setColor(Color.gray);
-        g.draw(shape);
+//        g.drawLine(position.x, position.y, position.x, position.y);
+        g.drawRect(location.x-SIZE/2, location.y-SIZE/2, SIZE, SIZE);
         sight.render(container, g);
     }
 
@@ -76,6 +84,11 @@ public class Foo {
         this.path = path;
         pathIdx = -1;
         int length = path.getLength();
-        if (length >= 0) pathIdx = 0;
+        if (length >= 0) {
+            pathIdx = 0;
+            resetAngle();
+        }
     }
+
+
 }
