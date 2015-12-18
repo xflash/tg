@@ -15,72 +15,142 @@ import java.util.List;
 public class Foo {
     private static final int SIGHT_RADIUS = 50;
     private static final int SIZE = 15;
+    private static final float MAX_VELOCITY = 3;
+    private static final float MAX_FORCE = 2.4f;
+
     //    private final Vector2f position = new Vector2f();
     private final Sight sight;
-    private final Vector2f location = new Vector2f();
+    private final Vector2f position = new Vector2f();
+    private final Vector2f velocity = new Vector2f();
+    private final Vector2f target = new Vector2f();
+    private final Vector2f desired = new Vector2f();
+    private final Vector2f steering=new Vector2f();
+    public float mass;
     private Path path;
     private int pathIdx;
     private double moveAngle;
     private float speed = .10f;
 
+
     public Foo(List<Sightable> sightables) {
         sight = new Sight(SIGHT_RADIUS, sightables);
+        velocity.set(-1, -2);
+        this.mass = 20.f;
+
+        truncate(velocity, MAX_VELOCITY);
+    }
+
+    private void truncate(Vector2f vector, float max) {
+        float i = max / vector.length();
+        vector.scale(i < 1. ? 1.f : i);
     }
 
     public void moveTo(float x, float y) {
 //        position.set(x, y);
-        location.set(x, y);
-        sight.moveTo(location.x, location.y);
+        position.set(x, y);
+        sight.moveTo(position.x, position.y);
+
+
     }
 
     public void update(GameContainer container, int delta) {
 
-        updatePath(delta);
+        target.set(container.getInput().getMouseX(), container.getInput().getMouseY());
 
-        sight.update(container, delta);
+        seek(target);
+        truncate(steering, MAX_FORCE);
+        steering.scale(1 / mass);
+
+        Vector2f.add(velocity, steering, velocity);
+        truncate(velocity, MAX_VELOCITY);
+
+        Vector2f.add(position, velocity, position);
     }
 
-    private boolean updatePath(int delta) {
-        if (pathIdx < 0)
-            return true;
-        Path.Step step = path.getStep(pathIdx);
+    private Vector2f seek(Vector2f target) {
+        Vector2f.sub(target, position, desired);
+        VectorUtils.normalize(desired);
 
-        if (goToStep(step, delta)) {
-            pathIdx++;
-            if (pathIdx >= path.getLength()) {
-                System.out.println("Resting to step 0");
-                pathIdx = 0;
+        desired.scale(MAX_VELOCITY);
+        return Vector2f.sub(desired, velocity, steering);
+    }
+
+    private Vector2f updatePath(int delta) {
+        Vector2f target = null;
+        if (path != null && pathIdx < 0) {
+            Path.Step step = path.getStep(pathIdx);
+            target = new Vector2f(step.getX(), step.getY());
+            if (distance(target) <= 9) {
+                pathIdx++;
+                if (pathIdx >= path.getLength()) {
+                    pathIdx = path.getLength() - 1;
+                }
             }
-            System.out.println("Moving to next step " + pathIdx);
-            resetAngle();
         }
-        return false;
+
+        return target != null ? seek(target) : new Vector2f();
+//
+//        float dx = (float) (Math.cos(moveAngle) * speed * delta);
+//        float dy = (float) (Math.sin(moveAngle) * speed * delta);
+//        moveTo(position.x + dx, position.y + dy);
+//
+//        float v = distance(step);
+//        if (v < 9) {
+//            pathIdx++;
+//            if (pathIdx >= path.getLength()) {
+//                System.out.println("Resting to step 0");
+//                pathIdx = 0;
+//            }
+//            System.out.println("Moving to next step " + pathIdx);
+//            resetAngle();
+//        }
+//        return false;
+    }
+
+    private float distance(Vector2f target) {
+        float xDelta = position.x - target.getX();
+        float yDelta = position.y - target.getY();
+        return xDelta * xDelta + yDelta * yDelta;
     }
 
     private void resetAngle() {
         Path.Step step = path.getStep(pathIdx);
-        moveAngle = AngleUtils.getTargetAngle(step.getX(), step.getY(), location.x, location.y);
+        moveAngle = AngleUtils.getTargetAngle(step.getX(), step.getY(), position.x, position.y);
         sight.lookAt(moveAngle);
-    }
-
-    private boolean goToStep(Path.Step step, int delta) {
-
-        float dx = (float) (Math.cos(moveAngle) * speed * delta);
-        float dy = (float) (Math.sin(moveAngle) * speed * delta);
-        moveTo(location.x + dx, location.y + dy);
-
-        float xDelta = location.x - step.getX();
-        float yDelta = location.y - step.getY();
-        return xDelta * xDelta + yDelta * yDelta < 9;
     }
 
 
     public void render(GameContainer container, Graphics g) {
         g.setColor(Color.gray);
 //        g.drawLine(position.x, position.y, position.x, position.y);
-        g.drawRect(location.x - SIZE / 2, location.y - SIZE / 2, SIZE, SIZE);
+        g.drawRect(position.x - SIZE / 2, position.y - SIZE / 2, SIZE, SIZE);
         sight.render(container, g);
+
+        VectorUtils.normalize(velocity);
+        VectorUtils.normalize(desired);
+        VectorUtils.normalize(steering);
+
+        // Force vectors
+        drawForceVector(g, velocity, new Color(0x00FF00));
+        drawForceVector(g, desired, new Color(0x454545));
+        drawForceVector(g, steering, new Color(0x0000FF));
     }
+
+    private void drawForceVector(Graphics g, Vector2f force, Color color) {
+        drawForceVector(g, force, color, 100);
+    }
+    private void drawForceVector(Graphics g, Vector2f force, Color color, float scale) {
+
+        float oldLineWidth = g.getLineWidth();
+        g.translate(position.x + SIZE / 2, position.y + SIZE / 2);
+        g.setColor(color);
+        g.setLineWidth(2);
+        g.drawLine(0,0, position.x + force.x * scale, position.y + force.y * scale);
+        g.setLineWidth(oldLineWidth);
+
+        g.resetTransform();
+    }
+
 
     public void follow(Path path) {
         this.path = path;
