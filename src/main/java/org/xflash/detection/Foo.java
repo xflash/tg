@@ -37,20 +37,12 @@ public class Foo {
         velocity.set(-1, -2);
         this.mass = 20.f;
 
-        truncate(velocity, MAX_VELOCITY);
-    }
-
-    private void truncate(Vector2f vector, float max) {
-        float i = max / vector.length();
-        vector.scale(i < 1. ? 1.f : i);
+        VectorUtils.truncate(velocity, MAX_VELOCITY);
     }
 
     public void moveTo(float x, float y) {
-//        position.set(x, y);
         position.set(x, y);
         sight.moveTo(position.x, position.y);
-
-
     }
 
     public void update(GameContainer container, int delta) {
@@ -58,11 +50,11 @@ public class Foo {
         target.set(container.getInput().getMouseX(), container.getInput().getMouseY());
 
         seek(target);
-        truncate(steering, MAX_FORCE);
+        VectorUtils.truncate(steering, MAX_FORCE);
         steering.scale(1 / mass);
 
         Vector2f.add(velocity, steering, velocity);
-        truncate(velocity, MAX_VELOCITY);
+        VectorUtils.truncate(velocity, MAX_VELOCITY);
 
         Vector2f.add(position, velocity, position);
     }
