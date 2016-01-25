@@ -53,10 +53,10 @@ public class Foo {
         VectorUtils.truncate(steering, MAX_FORCE);
         steering.scale(1 / mass);
 
-        Vector2f.add(velocity, steering, velocity);
+        VectorUtils.add(velocity, steering);
         VectorUtils.truncate(velocity, MAX_VELOCITY);
 
-        Vector2f.add(position, velocity, position);
+        VectorUtils.add(position, velocity);
     }
 
     private Vector2f seek(Vector2f target) {

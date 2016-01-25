@@ -1,9 +1,12 @@
 package org.xflash.mousefollowing;
 
+import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 import org.xflash.steering.Boid;
+import org.xflash.steering.PathFollower;
+import org.xflash.steering.Steering;
 import org.xflash.utils.AngleUtils;
 
 /**
@@ -12,11 +15,9 @@ import org.xflash.utils.AngleUtils;
  */
 public class MouseFollowingGame extends BasicGame {
 
+    private boolean drawForces = true;
     private Boid boid;
-    private int posX;
-    private int posY;
-    private double targetAngle;
-    private Shape shape;
+    private Vector2f mousPos = new Vector2f();
 
     public MouseFollowingGame() {
         super("MouseFollowing");
@@ -24,45 +25,32 @@ public class MouseFollowingGame extends BasicGame {
 
     @Override
     public void init(GameContainer container) throws SlickException {
-        posX = container.getWidth() / 2;
-        posY = container.getHeight() / 2;
+        int posX = container.getWidth() / 2;
+        int posY = container.getHeight() / 2;
 
-//        shape = new Rectangle(posX, posY, 30, 30);
-        Polygon polygon = new Polygon();
-        polygon.addPoint(0, -20);
-        polygon.addPoint(10, 20);
-        polygon.addPoint(-10, 20);
-        polygon.addPoint(0, -20);
-
-        shape = polygon;
-
-        boid = new Boid(posX, posY, 20, 10);
-
-    }
-
-    @Override
-    public void update(GameContainer container, int delta) throws SlickException {
-//        boid.update(container, delta);
+        boid = new Boid(posX, posY, 20, new Steering() {
+            public Vector2f computeTarget(Vector2f position) {
+                return mousPos;
+            }
+        });
     }
 
     @Override
     public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+        mousPos.set(newx, newy);
+    }
 
-        targetAngle = AngleUtils.getTargetAngle(posX, posY, newx, newy);
-//        boid.setRotation(targetAngle);
+    @Override
+    public void keyPressed(int key, char c) {
+        if(Input.KEY_SPACE==key) drawForces = !drawForces;
+    }
 
+    @Override
+    public void update(GameContainer container, int delta) throws SlickException {
+        boid.update(container, delta);
     }
 
     public void render(GameContainer container, Graphics g) throws SlickException {
-//        boid.render(container, g);
-
-        g.rotate(posX+10, posY+10, (float) Math.toDegrees(targetAngle));
-        g.drawRect(posX, posY, 20, 20);
-        g.resetTransform();
-
-        g.translate(posX, posY);
-        g.rotate(0, 0, (float) Math.toDegrees(targetAngle));
-        g.draw(shape);
-        g.resetTransform();
+        boid.render(container, g, drawForces);
     }
 }

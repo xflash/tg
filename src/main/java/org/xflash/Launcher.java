@@ -3,6 +3,8 @@ package org.xflash;
 import org.newdawn.slick.AppGameContainer;
 import org.xflash.collision.CollisionGame;
 import org.xflash.detection.DetectionGame;
+import org.xflash.flock.FlockGame;
+import org.xflash.mousePathBuilding.MousePathBuildingGame;
 import org.xflash.mousefollowing.MouseFollowingGame;
 import org.xflash.steering.SteeringPathFollowingGame;
 
@@ -19,7 +21,9 @@ public class Launcher {
 //                    new LightningTest()
 //                    new DetectionGame()
 //                    new MouseFollowingGame()
-                    new SteeringPathFollowingGame()
+//                    new SteeringPathFollowingGame()
+//                    new FlockGame()
+                    new MousePathBuildingGame()
 //                    new CollisionGame()
 //                    new LightningTest()
 //                    new AStarGame()

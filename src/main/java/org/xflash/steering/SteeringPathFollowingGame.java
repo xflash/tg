@@ -41,12 +41,10 @@ public class SteeringPathFollowingGame extends BasicGame {
 
         // Add boids
         for (int i = 0; i < MAX_BOIDS; i++) {
-            Boid boid = new Boid(containerWidth / 2 + random.nextFloat() * 50,
+            boids.add(new Boid(containerWidth / 2 + random.nextFloat() * 50,
                                  20 * random.nextFloat(),
                                  20 + random.nextFloat() * 20,
-                                nodeRadius);
-            boid.path = path;
-            boids.add(boid);
+                                new PathFollower(path, nodeRadius)));
         }
 
     }
@@ -71,8 +69,5 @@ public class SteeringPathFollowingGame extends BasicGame {
             boid.render(container, g, drawForces);
         }
     }
-
-
-
 
 }

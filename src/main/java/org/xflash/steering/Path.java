@@ -25,6 +25,7 @@ public class Path {
 
     public void render(GameContainer container, Graphics g, int radius) {
 
+        if(nodes.isEmpty())return;
         Vector2f currentnode = nodes.elementAt(0);
         drawPoint(g, currentnode, radius);
 
@@ -53,5 +54,14 @@ public class Path {
         g.drawOval(force.x - radius, force.y - radius, diameter, diameter);
 
         g.resetLineWidth();
+    }
+
+    public boolean hasNodes() {
+        return !nodes.isEmpty();
+    }
+
+    public void removeLastNodes() {
+        if(nodes.isEmpty())return;
+        nodes.remove(nodes.size() - 1);
     }
 }
