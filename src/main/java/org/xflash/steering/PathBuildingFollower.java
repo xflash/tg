@@ -15,14 +15,22 @@ public class PathBuildingFollower extends PathFollower {
 
     public PathBuildingFollower(final Path path, int nodeRadius, GameContainer container) {
         super(path, nodeRadius);
-        path.addNode(new Vector2f(container.getWidth()/2, container.getHeight()/2));
-        container.getInput().addMouseListener(new InputAdapter(){
-            @Override
-            public void mousePressed(int button, int x, int y) {
-                if(button==0)path.addNode(new Vector2f(x,y));
-                else if(button==1)path.removeLastNodes();
-            }
-        });
+        path.addNode(new Vector2f(container.getWidth() / 2, container.getHeight() / 2));
+        Input input = container.getInput();
+        input.addMouseListener(new InputAdapter() {
+                                   @Override
+                                   public void mousePressed(int button, int x, int y) {
+                                       if (button == 0) path.addNode(new Vector2f(x, y));
+                                       else if (button == 1) path.removeLastNodes();
+                                   }
+
+                                   @Override
+                                   public void mouseDragged(int oldx, int oldy, int newx, int newy) {
+                                       path.addNode(new Vector2f(newx, newy));
+                                   }
+                               }
+        );
+
     }
 
     @Override

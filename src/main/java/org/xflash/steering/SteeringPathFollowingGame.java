@@ -5,7 +5,6 @@ import org.newdawn.slick.*;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Vector;
 
 /**
  * @author rcoqueugniot
@@ -57,7 +56,7 @@ public class SteeringPathFollowingGame extends BasicGame {
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         for (Boid boid : boids) {
-            boid.update(container, delta);
+            boid.update(container, delta, boids);
         }
     }
 

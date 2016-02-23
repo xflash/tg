@@ -1,12 +1,9 @@
 package org.xflash.mousePathBuilding;
 
-import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.*;
-import org.newdawn.slick.util.InputAdapter;
 import org.xflash.steering.Boid;
 import org.xflash.steering.Path;
 import org.xflash.steering.PathBuildingFollower;
-import org.xflash.steering.PathFollower;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,18 +29,23 @@ public class MousePathBuildingGame extends BasicGame {
         int containerHeight = container.getHeight();
 
         Random random = new Random();
+        Flocker flocker = new Flocker(boids);
+        PathBuildingFollower steerer = new PathBuildingFollower(path, NODE_RADIUS, container);
+        CumulativeSteering cumulativeSteering = new CumulativeSteering(steerer);
+        for (int i = 0; i < 50; i++) {
+            boids.add(new Boid(
+                    containerWidth / 2 + random.nextFloat() * 50,
+                    containerHeight / 2 + 20 * random.nextFloat(),
+                    20 + random.nextFloat() * 20,
+                    cumulativeSteering));
 
-        boids.add(new Boid(containerWidth / 2 + random.nextFloat() * 50,
-                20 * random.nextFloat(),
-                20 + random.nextFloat() * 20,
-                new PathBuildingFollower(path, NODE_RADIUS, container)));
-
+        }
     }
 
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         for (Boid boid : boids) {
-            boid.update(container, delta);
+            boid.update(container, delta, boids);
         }
     }
 

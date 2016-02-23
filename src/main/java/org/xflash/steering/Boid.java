@@ -1,19 +1,14 @@
 package org.xflash.steering;
 
-import org.lwjgl.util.vector.Vector;
 import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.Font;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Polygon;
 import org.xflash.detection.VectorUtils;
 import org.xflash.utils.AngleUtils;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 /**
  */
@@ -23,8 +18,8 @@ public class Boid {
     public static final float MAX_FORCE = MAX_VELOCITY * 3;
     private static final int FORCE_SCALE = 100;
 
-    private final Vector2f position;
-    private final Vector2f velocity;
+    public final Vector2f position;
+    public final Vector2f velocity;
     private final Vector2f desired;
 
     private final float mass;
@@ -32,17 +27,22 @@ public class Boid {
     private final Polygon polygon;
     private double rotation;
     private Steering steerer;
+    private Vector2f acceleration;
+    private float maxforce;
 
     public Boid(float posX, float posY, float totalMass, Steering steerer) {
 
         position = new Vector2f(posX, posY);
         velocity = new Vector2f(-1, -2);
         desired = new Vector2f(0, 0);
+        acceleration = new Vector2f();
+
         mass = totalMass;
         this.steerer = steerer;
 
         Random random = new Random();
         maxVelocity = MAX_VELOCITY * (0.8f + random.nextFloat() * 0.2f);
+        maxforce = 0.03f;
 
         VectorUtils.truncate(velocity, maxVelocity);
 
@@ -54,7 +54,7 @@ public class Boid {
         });
     }
 
-    public void update(GameContainer container, int delta) {
+    public void update(GameContainer container, int delta, List<Boid> boids) {
 
         Vector2f steering=new Vector2f(0, 0);
 
@@ -64,13 +64,17 @@ public class Boid {
                 target=new Vector2f(container.getWidth()/2, container.getHeight()/2);
 //                target = new Vector2f(position.x, position.y);
             }
-            steering=seek(target, position, velocity, maxVelocity, desired);
+            steering = seek(target);
         }
+
+//        flock(boids);
 
         VectorUtils.truncate(steering, MAX_FORCE);
         steering.scale(1 / mass);
 
         VectorUtils.add(velocity, steering);
+        VectorUtils.add(velocity, acceleration);
+        acceleration.scale((float) 0);
         VectorUtils.truncate(velocity, maxVelocity);
 
         VectorUtils.add(position, velocity);
@@ -79,11 +83,13 @@ public class Boid {
         VectorUtils.normalize(steering);
         VectorUtils.normalize(desired);
 
+
         // Adjust boid rotation to match the velocity vector.
         rotation = AngleUtils.getTargetAngle(0, 0, velocity.x, velocity.y);
     }
 
-    private Vector2f seek(Vector2f target, Vector2f position, Vector2f velocity, float maxVelocity, Vector2f desired) {
+
+    private Vector2f seek(Vector2f target) {
         Vector2f.sub(target, position, desired);
         VectorUtils.normalize(desired);
         desired.scale(maxVelocity);

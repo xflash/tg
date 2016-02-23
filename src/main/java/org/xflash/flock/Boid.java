@@ -61,7 +61,7 @@ public class Boid {
     }
 
 
-    void applyForce(Vector2f force) {
+    void applyForce2Accelearation(Vector2f force) {
         // We could add mass here if we want A = F / M
         Vector2f.add(acceleration, force, acceleration);
     }
@@ -76,9 +76,9 @@ public class Boid {
         ali.scale(1.0f);
         coh.scale(1.0f);
         // Add the force vectors to acceleration
-        applyForce(sep);
-        applyForce(ali);
-        applyForce(coh);
+        applyForce2Accelearation(sep);
+        applyForce2Accelearation(ali);
+        applyForce2Accelearation(coh);
     }
 
 
