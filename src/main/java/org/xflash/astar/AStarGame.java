@@ -40,7 +40,7 @@ public class AStarGame extends BasicGame {
             }
         });
 
-        checkBoxWidget = new CheckBoxWidget(gc, maxDistanceWidget.getX() + maxDistanceWidget.getWidth() + 5, maxDistanceWidget.getY(), new ValueListener<Boolean>() {
+        checkBoxWidget = new CheckBoxWidget(gc, maxDistanceWidget.getX() + maxDistanceWidget.getWidth() + 5, maxDistanceWidget.getY(), "Diag.", new ValueListener<Boolean>() {
             public void valueChanged(Boolean value) {
                 for (PathFinderListener pathFinderListener : pathFinderListeners) {
                     pathFinderListener.diagonalAllowed(value);
