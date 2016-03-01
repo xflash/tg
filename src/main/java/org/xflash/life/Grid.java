@@ -79,20 +79,25 @@ public class Grid extends AbstractComponent {
     @Override
     public void render(GUIContext container, Graphics g) throws SlickException {
         g.translate(pos.x, pos.y);
-        for (int i = 0; i < cells.length; i++) {
-            for (int j = 0; j < cells[i].length; j++) {
-                int x1 = i * size + 0;
-                int y1 = j * size + 0;
-                if (cells[i][j]) {
+        for (int gx = 0; gx < cells.length; gx++) {
+            for (int gy = 0; gy < cells[gx].length; gy++) {
+                int x1 = gx * size + 0;
+                int y1 = gy * size + 0;
+                if (cells[gx][gy]) {
                     g.setColor(Color.cyan);
                     g.fillRect(x1, y1, size - 0, size - 0);
                 }
-                if (i == xm && j == ym) {
+                if (gx == xm && gy == ym) {
                     g.setColor(Color.orange);
                     g.fillRect(x1, y1, size - 0, size - 0);
                 }
                 g.setColor(Color.lightGray);
-                g.drawRect(i * size, j * size, size, size);
+                g.drawRect(gx * size, gy * size, size, size);
+
+//                g.setColor(Color.green);
+//                int S = calcS(gx, gy);
+//                g.drawString("" + S, gx * size, gy * size);
+
             }
         }
         g.resetTransform();
@@ -149,10 +154,10 @@ public class Grid extends AbstractComponent {
 
     public void update(int delta) {
         age += delta;
-        if (age >= 1000) {
+//        if (age >= 200) {
             age = 0;
             updateCells();
-        }
+//        }
     }
 
     private void updateCells() {
@@ -160,14 +165,12 @@ public class Grid extends AbstractComponent {
 // il est possible de calculer son état suivant avec: (S = 3) OU (E = 1 ET S = 2).
 // Avec 1 pour une cellule vivante et 0 pour une cellule morte.
 
-        boolean[][] nextCells = Arrays.copyOf(cells, cells.length);
+        boolean[][] nextCells = new boolean[w][h];
 
         for (int x = 0; x < cells.length; x++) {
             for (int y = 0; y < cells[x].length; y++) {
                 int S = calcS(x, y);
-//                System.out.println(String.format("S(%d,%d)=%d", x, y, S));
-                boolean E = cells[x][y];
-                nextCells[x][y] = (S == 3) || (E && S == 2);
+                nextCells[x][y] = (S == 3) || (cells[x][y] && S == 2);
             }
         }
         cells = nextCells;
@@ -176,48 +179,24 @@ public class Grid extends AbstractComponent {
     private int calcS(int x, int y) {
         int S = 0;
 
-        S += addNW(x, y);
-        S += addN(x, y);
-        S += addNE(x, y);
-        S += addE(x, y);
-        S += addSE(x, y);
-        S += addS(x, y);
-        S += addSW(x, y);
-        S += addW(x, y);
+        S += add(x - 1, y - 1); //NW
+        S += add(x, y - 1); //N
+        S += add(x + 1, y - 1); //NE
+        S += add(x + 1, y); //E
+        S += add(x + 1, y + 1); //SE
+        S += add(x, y + 1); //S
+        S += add(x - 1, y + 1); //SW
+        S += add(x - 1, y); //W
 
         return S;
     }
 
-    private int addNW(int x, int y) {
-        return x > 0 && y > 0 ? cells[x - 1][y - 1] ? 1 : 0 : 0;
-    }
-
-    private int addN(int x, int y) {
-        return y > 0 ? cells[x][y - 1] ? 1 : 0 : 0;
-    }
-
-    private int addNE(int x, int y) {
-        return x < w - 1 && y > 0 ? cells[x + 1][y - 1] ? 1 : 0 : 0;
-    }
-
-    private int addE(int x, int y) {
-        return x < w - 1 ? cells[x + 1][y] ? 1 : 0 : 0;
-    }
-
-    private int addSE(int x, int y) {
-        return x < w - 1 && y < h - 1 ? cells[x + 1][y + 1] ? 1 : 0 : 0;
-    }
-
-    private int addS(int x, int y) {
-        return y < h - 1 ? cells[x][y + 1] ? 1 : 0 : 0;
-    }
-
-    private int addSW(int x, int y) {
-        return x > 0 && y < h - 1 ? cells[x - 1][y + 1] ? 1 : 0 : 0;
-    }
-
-    private int addW(int x, int y) {
-        return x > 0 ? cells[x - 1][y] ? 1 : 0 : 0;
+    private int add(int x, int y) {
+        try {
+            return cells[x][y] ? 1 : 0;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return 0;
+        }
     }
 
 

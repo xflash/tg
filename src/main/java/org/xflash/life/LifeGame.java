@@ -7,15 +7,17 @@ import org.xflash.astar.gui.CheckBoxWidget;
 import org.xflash.astar.gui.ClickableBox;
 import org.xflash.astar.gui.ValueListener;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  */
 public class LifeGame extends BasicGame {
 
     private Grid grid;
     private boolean lifeRunning;
-    private CheckBoxWidget widget;
-    private ClickableBox acorn;
-    private ClickableBox clear;
+    private ArrayList<AbstractComponent> widgets;
+
 
     public LifeGame() {
         super("LifeGame");
@@ -25,34 +27,43 @@ public class LifeGame extends BasicGame {
     public void init(GameContainer container) throws SlickException {
         container.setShowFPS(false);
 
-        grid = new Grid(container, 20, 20,
-                20, 20, 15);
+        int x = 20;
+        int y = 20;
+        widgets = new ArrayList<AbstractComponent>();
 
-        int x = grid.getX() + grid.getWidth() + 20;
-        int y = grid.getY();
+        AbstractComponent widget;
+
         widget = new CheckBoxWidget(container, x, y, "Run", new ValueListener<Boolean>() {
             public void valueChanged(Boolean value) {
                 lifeRunning = !lifeRunning;
             }
         });
+        x += 0;
         y += widget.getHeight() + 20;
-
-        clear = new ClickableBox(container, "Clear", x, y, new ComponentListener() {
+        widgets.add(widget);
+        widget = new ClickableBox(container, "Clear", x, y, new ComponentListener() {
             public void componentActivated(AbstractComponent source) {
                 grid.reset();
             }
         });
-        y += clear.getHeight() + 20;
+        x += 0;
+        y += widget.getHeight() + 20;
+        widgets.add(widget);
 
-        acorn = new ClickableBox(container, "acorn", x, y, new ComponentListener() {
-            public void componentActivated(AbstractComponent source) {
-                grid.apply(5, 5, new char[][]{
-                        {0, 1, 0, 0, 0, 0, 0},
-                        {0, 0, 0, 1, 0, 0, 0},
-                        {1, 1, 0, 0, 1, 1, 1},
-                });
-            }
-        });
+        for (final Pattern pattern : Pattern.patterns) {
+            widget = new ClickableBox(container, pattern.getName(), x, y, new ComponentListener() {
+                public void componentActivated(AbstractComponent source) {
+                    grid.apply(5, 5, pattern.getChars());
+                }
+            });
+            widgets.add(widget);
+            y += widget.getHeight() + 10;
+        }
+
+        grid = new Grid(container,
+                100, 20,
+                100, 100, 5);
+
     }
 
     @Override
@@ -61,9 +72,10 @@ public class LifeGame extends BasicGame {
     }
 
     public void render(GameContainer container, Graphics g) throws SlickException {
-        widget.render(container, g);
-        clear.render(container, g);
-        acorn.render(container, g);
+        for (AbstractComponent widget : widgets) {
+            widget.render(container, g);
+        }
+
         grid.render(container, g);
 
         g.setColor(Color.red);
