@@ -7,8 +7,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.GUIContext;
-
-import java.util.Arrays;
+import org.xflash.utils.ArrayUtils;
 
 /**
  */
@@ -218,4 +217,13 @@ public class Grid extends AbstractComponent {
     public void setMousePattern(char[][] mousePattern) {
         this.mousePattern = mousePattern;
     }
+
+    public void rotateMousePattern() {
+        if (mousePattern == null) return;
+
+//        mousePattern = ArrayUtils.transpose(mousePattern);
+        mousePattern = ArrayUtils.rotateCW(mousePattern);
+
+    }
+
 }

@@ -61,6 +61,12 @@ public class LifeGame extends BasicGame {
             y += widget.getHeight() + 10;
         }
 
+        widgets.add(new ClickableBox(container, "ROT", x, y, new ComponentListener() {
+            public void componentActivated(AbstractComponent source) {
+                grid.rotateMousePattern();
+            }
+        }));
+
         grid = new Grid(container,
                 100, 20,
                 100, 100, 5);
