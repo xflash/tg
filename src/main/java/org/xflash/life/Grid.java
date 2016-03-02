@@ -23,6 +23,7 @@ public class Grid extends AbstractComponent {
     private int ym;
     private int age;
     private Boolean mouseDragging;
+    private char[][] mousePattern;
 
     public Grid(GUIContext container, int x, int y, int w, int h, int size) {
         super(container);
@@ -40,7 +41,7 @@ public class Grid extends AbstractComponent {
 
     public void apply(int offsetX, int offsetY, char[][] newcells) {
         if ((offsetY + newcells.length) > h || (offsetX + newcells[0].length) > w) return;
-        reset();
+//        reset();
         for (int i = 0; i < newcells.length; i++) {
             for (int j = 0; j < newcells[i].length; j++) {
                 char c = newcells[i][j];
@@ -88,8 +89,7 @@ public class Grid extends AbstractComponent {
                     g.fillRect(x1, y1, size - 0, size - 0);
                 }
                 if (gx == xm && gy == ym) {
-                    g.setColor(Color.orange);
-                    g.fillRect(x1, y1, size - 0, size - 0);
+                    renderPattern(g, xm, ym);
                 }
                 g.setColor(Color.lightGray);
                 g.drawRect(gx * size, gy * size, size, size);
@@ -103,28 +103,42 @@ public class Grid extends AbstractComponent {
         g.resetTransform();
     }
 
-    @Override
-    public void mousePressed(int button, int x, int y) {
-        super.mousePressed(button, x, y);
-        if (Rectangle.contains(x, y, getX(), getY(), getWidth(), getHeight())) {
-            int gx = Math.min(w - 1, (int) ((x - pos.x) / size));
-            int gy = Math.min(h - 1, (int) ((y - pos.y) / size));
-            cells[gx][gy] = !cells[gx][gy];
-            mouseDragging = cells[gx][gy];
-        } else
-            mouseDragging = null;
-    }
-
-    @Override
-    public void mouseDragged(int oldx, int oldy, int x, int y) {
-        if (Rectangle.contains(x, y, getX(), getY(), getWidth(), getHeight())) {
-            int gx = Math.min(w - 1, (int) ((x - pos.x) / size));
-            int gy = Math.min(h - 1, (int) ((y - pos.y) / size));
-            cells[gx][gy] = mouseDragging;
-            xm = -1;
-            ym = -1;
+    private void renderPattern(Graphics g, int xm, int ym) {
+        g.setColor(Color.orange);
+//        g.fillRect(xm, ym, size - 0, size - 0);
+        for (int y = 0; y < mousePattern.length; y++) {
+            for (int x = 0; x < mousePattern[y].length; x++) {
+                char c = mousePattern[y][x];
+                if (c != 0) {
+                    if ((xm + x) < w && (ym + y) < h)
+                        g.fillRect((xm + x) * size, (ym + y) * size, size - 0, size - 0);
+                }
+            }
         }
     }
+//
+//    @Override
+//    public void mousePressed(int button, int x, int y) {
+//        super.mousePressed(button, x, y);
+//        if (Rectangle.contains(x, y, getX(), getY(), getWidth(), getHeight())) {
+//            int gx = Math.min(w - 1, (int) ((x - pos.x) / size));
+//            int gy = Math.min(h - 1, (int) ((y - pos.y) / size));
+//            cells[gx][gy] = !cells[gx][gy];
+//            mouseDragging = cells[gx][gy];
+//        } else
+//            mouseDragging = null;
+//    }
+//
+//    @Override
+//    public void mouseDragged(int oldx, int oldy, int x, int y) {
+//        if (Rectangle.contains(x, y, getX(), getY(), getWidth(), getHeight())) {
+//            int gx = Math.min(w - 1, (int) ((x - pos.x) / size));
+//            int gy = Math.min(h - 1, (int) ((y - pos.y) / size));
+//            cells[gx][gy] = mouseDragging;
+//            xm = -1;
+//            ym = -1;
+//        }
+//    }
 
     @Override
     public void mouseReleased(int button, int x, int y) {
@@ -136,7 +150,8 @@ public class Grid extends AbstractComponent {
             } else {
                 int gx = Math.min(w - 1, (int) ((x - pos.x) / size));
                 int gy = Math.min(h - 1, (int) ((y - pos.y) / size));
-                cells[gx][gy] = !cells[gx][gy];
+//                cells[gx][gy] = !cells[gx][gy];
+                apply(gx, gy, mousePattern);
             }
         }
     }
@@ -200,4 +215,7 @@ public class Grid extends AbstractComponent {
     }
 
 
+    public void setMousePattern(char[][] mousePattern) {
+        this.mousePattern = mousePattern;
+    }
 }

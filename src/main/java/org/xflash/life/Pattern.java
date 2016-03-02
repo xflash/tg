@@ -10,6 +10,9 @@ public class Pattern {
 
     static {
         Pattern.patterns = Arrays.asList(
+                new Pattern("single", new char[][]{
+                        {1},
+                }),
                 new Pattern("acron", new char[][]{
                         {0, 1, 0, 0, 0, 0, 0},
                         {0, 0, 0, 1, 0, 0, 0},

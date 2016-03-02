@@ -53,7 +53,8 @@ public class LifeGame extends BasicGame {
         for (final Pattern pattern : Pattern.patterns) {
             widget = new ClickableBox(container, pattern.getName(), x, y, new ComponentListener() {
                 public void componentActivated(AbstractComponent source) {
-                    grid.apply(5, 5, pattern.getChars());
+//                    grid.apply(5, 5, pattern.getChars());
+                    grid.setMousePattern(pattern.getChars());
                 }
             });
             widgets.add(widget);
@@ -63,6 +64,8 @@ public class LifeGame extends BasicGame {
         grid = new Grid(container,
                 100, 20,
                 100, 100, 5);
+
+        grid.setMousePattern(new char[][]{{1}});
 
     }
 
