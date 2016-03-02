@@ -3,12 +3,12 @@ package org.xflash.life;
 import org.newdawn.slick.*;
 import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
+import org.newdawn.slick.util.InputAdapter;
 import org.xflash.astar.gui.CheckBoxWidget;
 import org.xflash.astar.gui.ClickableBox;
 import org.xflash.astar.gui.ValueListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  */
@@ -63,9 +63,19 @@ public class LifeGame extends BasicGame {
 
         widgets.add(new ClickableBox(container, "ROT", x, y, new ComponentListener() {
             public void componentActivated(AbstractComponent source) {
-                grid.rotateMousePattern();
+                grid.rotateMousePattern(true);
             }
         }));
+
+        container.getInput().addKeyListener(new InputAdapter() {
+            @Override
+            public void keyReleased(int key, char c) {
+                if (key == Input.KEY_RIGHT)
+                    grid.rotateMousePattern(true);
+                if (key == Input.KEY_LEFT)
+                    grid.rotateMousePattern(false);
+            }
+        });
 
         grid = new Grid(container,
                 100, 20,

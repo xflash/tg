@@ -168,19 +168,14 @@ public class Grid extends AbstractComponent {
 
     public void update(int delta) {
         age += delta;
-//        if (age >= 200) {
+        if (age >= 100) {
             age = 0;
             updateCells();
-//        }
+        }
     }
 
     private void updateCells() {
-// Si l'on considère la somme de ses côtés S et E l'état initial de la cellule,
-// il est possible de calculer son état suivant avec: (S = 3) OU (E = 1 ET S = 2).
-// Avec 1 pour une cellule vivante et 0 pour une cellule morte.
-
         boolean[][] nextCells = new boolean[w][h];
-
         for (int x = 0; x < cells.length; x++) {
             for (int y = 0; y < cells[x].length; y++) {
                 int S = calcS(x, y);
@@ -192,7 +187,6 @@ public class Grid extends AbstractComponent {
 
     private int calcS(int x, int y) {
         int S = 0;
-
         S += add(x - 1, y - 1); //NW
         S += add(x, y - 1); //N
         S += add(x + 1, y - 1); //NE
@@ -201,16 +195,12 @@ public class Grid extends AbstractComponent {
         S += add(x, y + 1); //S
         S += add(x - 1, y + 1); //SW
         S += add(x - 1, y); //W
-
         return S;
     }
 
     private int add(int x, int y) {
-        try {
-            return cells[x][y] ? 1 : 0;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return 0;
-        }
+        if (x < 0 || y < 0 || x >= w || y >= h) return 0;
+        return cells[x][y] ? 1 : 0;
     }
 
 
@@ -218,12 +208,11 @@ public class Grid extends AbstractComponent {
         this.mousePattern = mousePattern;
     }
 
-    public void rotateMousePattern() {
+    public void rotateMousePattern(boolean cw) {
         if (mousePattern == null) return;
-
-//        mousePattern = ArrayUtils.transpose(mousePattern);
-        mousePattern = ArrayUtils.rotateCW(mousePattern);
-
+        mousePattern = cw ?
+                ArrayUtils.rotateCW(mousePattern)
+                : ArrayUtils.rotateCCW(mousePattern);
     }
 
 }
